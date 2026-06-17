@@ -46,7 +46,8 @@ const STORAGE_KEYS = {
   PRODUCTS: 'fluffy_bloom_products',
   ORDERS: 'fluffy_bloom_orders',
   USERS: 'fluffy_bloom_users',
-  LOGGED_IN_USER: 'fluffy_bloom_logged_in_user'
+  LOGGED_IN_USER: 'fluffy_bloom_logged_in_user',
+  GOOGLE_SHEET_URL: 'fluffy_bloom_sheets_url'
 };
 
 // Initialize DB if empty
@@ -105,7 +106,42 @@ export const getProducts = (): Product[] => {
   return prods ? JSON.parse(prods) : [];
 };
 
-export const saveProduct = (product: Product): void => {
+export const getGoogleSheetUrl = (): string => {
+  return localStorage.getItem(STORAGE_KEYS.GOOGLE_SHEET_URL) || '';
+};
+
+export const setGoogleSheetUrl = (url: string): void => {
+  localStorage.setItem(STORAGE_KEYS.GOOGLE_SHEET_URL, url);
+};
+
+export const syncProducts = async (): Promise<Product[]> => {
+  const url = getGoogleSheetUrl();
+  if (!url) return getProducts();
+  
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const data = await response.json();
+      const parsedProducts: Product[] = data.map((item: any) => ({
+        id: String(item.id || ''),
+        title: String(item.title || ''),
+        description: String(item.description || ''),
+        category: String(item.category || 'flowers') as any,
+        price: Number(item.price || 0),
+        originalPrice: Number(item.originalPrice || 0),
+        image: String(item.image || ''),
+        isAvailable: item.isAvailable === true || item.isAvailable === 'true' || item.isAvailable === 1 || item.isAvailable === '1'
+      }));
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(parsedProducts));
+      return parsedProducts;
+    }
+  } catch (e) {
+    console.error("Failed to sync products from Google Sheet:", e);
+  }
+  return getProducts();
+};
+
+export const saveProduct = async (product: Product): Promise<void> => {
   const products = getProducts();
   const index = products.findIndex(p => p.id === product.id);
   
@@ -116,12 +152,48 @@ export const saveProduct = (product: Product): void => {
   }
   
   localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+
+  const url = getGoogleSheetUrl();
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: JSON.stringify({
+          action: 'save',
+          product: product
+        })
+      });
+    } catch (e) {
+      console.error("Failed to post product to Google Sheets:", e);
+    }
+  }
 };
 
-export const deleteProduct = (id: string): void => {
+export const deleteProduct = async (id: string): Promise<void> => {
   const products = getProducts();
   const filtered = products.filter(p => p.id !== id);
   localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(filtered));
+
+  const url = getGoogleSheetUrl();
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          id: id
+        })
+      });
+    } catch (e) {
+      console.error("Failed to delete product from Google Sheets:", e);
+    }
+  }
 };
 
 // User Functions

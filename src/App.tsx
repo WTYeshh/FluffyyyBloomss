@@ -8,7 +8,7 @@ import { OrderTrackerView } from './views/OrderTrackerView';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { AuthModal } from './components/AuthModal';
 import { Preloader } from './components/Preloader';
-import { getLoggedInUser, getProducts, logoutUser } from './data/db';
+import { getLoggedInUser, getProducts, logoutUser, syncProducts } from './data/db';
 import type { Product, User } from './data/db';
 import { Heart, Lock } from 'lucide-react';
 
@@ -30,8 +30,13 @@ function App() {
 
   // Initialize data on mount
   useEffect(() => {
-    // Get products
+    // Get local products first (fast)
     setProducts(getProducts());
+
+    // Sync with Google Sheets in the background
+    syncProducts().then(syncedProducts => {
+      setProducts(syncedProducts);
+    });
     
     // Get logged-in user
     setCurrentUser(getLoggedInUser());
@@ -55,6 +60,9 @@ function App() {
   // Refresh products list
   const refreshProducts = () => {
     setProducts(getProducts());
+    syncProducts().then(syncedProducts => {
+      setProducts(syncedProducts);
+    });
   };
 
   const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
