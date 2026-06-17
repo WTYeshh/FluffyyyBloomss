@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Laptop/Desktop Actions + Mobile Burger Toggle */}
         <div className="nav-actions">
           {/* Sign In (Desktop) */}
-          <div style={{ display: 'flex', gap: '0.75rem' }} className="nav-links">
+          <div className="nav-links" style={{ gap: '0.75rem' }}>
             {currentUser ? (
               <div className="user-profile-btn">
                 <UserIcon size={15} />

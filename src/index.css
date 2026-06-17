@@ -94,12 +94,31 @@
 
 body {
   font-family: var(--font-base);
-  background: linear-gradient(var(--bg-store-overlay), var(--bg-store-overlay)), url('/images/universal_bg.png') no-repeat fixed center;
-  background-size: cover;
   color: var(--text-main);
-  transition: var(--transition-slow);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  position: relative;
+  min-height: 100vh;
+  color: var(--text-main);
+  transition: color 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.app-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(var(--bg-store-overlay), var(--bg-store-overlay)), url('/images/universal_bg.png') no-repeat center;
+  background-size: cover;
+  pointer-events: none;
+  transition: background 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 a {
@@ -1051,9 +1070,7 @@ button {
 .drawer-link:hover, .drawer-link.active {
   color: var(--text-main);
   border-bottom-color: var(--primary);
-}
-
-/* Responsive Navbar overrides */
+}/* Responsive Navbar overrides */
 @media (max-width: 768px) {
   .nav-links {
     display: none; /* Hide standard nav links on mobile */
@@ -1069,6 +1086,9 @@ button {
   .header-nav {
     padding: 1rem 1.5rem;
   }
+
+  .product-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
-
-
