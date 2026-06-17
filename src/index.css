@@ -68,21 +68,21 @@
   --shadow-lg: 0 16px 40px hsla(265, 30%, 40%, 0.08);
 }
 
-/* Theme: One Piece Art (Dark, High-contrast, Crimson & Gold) */
+/* Theme: One Piece Art (Cozy Light, Warm Sand & Crimson & Gold) */
 .theme-art {
   --font-base: 'Outfit', sans-serif;
   --primary-h: 0;
   --primary-s: 75%;
   --primary-l: 50%;
-  --bg-store: #0d121b; /* Muted dark slate */
-  --bg-store-overlay: rgba(13, 18, 27, 0.94);
-  --bg-card: rgba(18, 25, 38, 0.86); /* Soft dark glass */
-  --text-main: #e5e7eb;
-  --text-muted: #9ca3af;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #d97706;
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --bg-store: #e6ded6; /* Cozy warm oatmeal sand */
+  --bg-store-overlay: rgba(230, 222, 214, 0.88);
+  --bg-card: rgba(254, 252, 250, 0.8);
+  --text-main: #4a3434; /* Warm crimson-tinted dark brown */
+  --text-muted: #8a7070;
+  --border: rgba(220, 185, 180, 0.3);
+  --accent: #d97706; /* Gold/amber */
+  --shadow-md: 0 8px 24px hsla(0, 20%, 40%, 0.03);
+  --shadow-lg: 0 16px 40px hsla(0, 20%, 40%, 0.06);
 }
 
 /* Global Reset */
@@ -124,11 +124,6 @@ button {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.theme-art .glass {
-  background: rgba(20, 27, 39, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Scrollbar Customization */
@@ -487,9 +482,7 @@ button {
   -webkit-backdrop-filter: blur(24px);
 }
 
-.theme-art .modal-content {
-  border-color: #1f2937;
-}
+
 
 .modal-close {
   position: absolute;

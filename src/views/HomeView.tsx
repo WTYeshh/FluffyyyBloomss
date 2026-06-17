@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Flower, ShieldCheck, Sparkles, MessageCircle, ArrowRight } from 'lucide-react';
+import { Heart, Flower, Sparkles, ArrowRight } from 'lucide-react';
 import type { Product } from '../data/db';
 
 interface HomeViewProps {
@@ -204,59 +204,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 3. Handcrafted Value Proposition */}
-      <section 
-        style={{
-          background: 'rgba(254, 252, 250, 0.35)',
-          borderTop: '1px solid var(--border)',
-          borderBottom: '1px solid var(--border)',
-          padding: '4rem 2rem',
-          backdropFilter: 'blur(6px)'
-        }}
-      >
-        <div 
-          style={{ 
-            maxWidth: '1200px', 
-            margin: '0 auto', 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
-            gap: '3rem',
-            textAlign: 'center'
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>
-              <Heart size={32} />
-            </div>
-            <h4 style={{ fontWeight: 'bold', fontSize: '1.15rem' }}>Handcrafted with Love</h4>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Each item is stitched, painted, or carved manually by hand. No factory machinery—pure artistry.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>
-              <ShieldCheck size={32} />
-            </div>
-            <h4 style={{ fontWeight: 'bold', fontSize: '1.15rem' }}>Eco-Friendly Fibers</h4>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              We source organic milk cotton yarns and natural pine woods, ensuring maximum safety, softness, and durability.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>
-              <Sparkles size={32} />
-            </div>
-            <h4 style={{ fontWeight: 'bold', fontSize: '1.15rem' }}>Tactical Marketing Pricing</h4>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Enjoy premium boutique art without the luxury markup. Our scratch-pricing tactics mean you save up to 50%!
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Showcase of Bestsellers */}
+      {/* 3. Showcase of Bestsellers */}
       <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
           <div>
@@ -304,30 +252,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
             );
           })}
-        </div>
-      </section>
-
-      {/* 5. Reviews Section */}
-      <section style={{ maxWidth: '800px', margin: '0 auto', padding: '0 2rem', width: '100%', textAlign: 'center' }}>
-        <MessageCircle size={32} style={{ color: 'var(--primary)', marginBottom: '1.25rem' }} />
-        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '2.5rem' }}>Loved by Collectors</h2>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <div 
-            style={{ 
-              background: 'var(--bg-card)', 
-              border: '1px solid var(--border)', 
-              borderRadius: '24px', 
-              padding: '2rem',
-              boxShadow: 'var(--shadow-sm)',
-              position: 'relative'
-            }}
-          >
-            <p style={{ fontSize: '1.1rem', fontStyle: 'italic', lineHeight: '1.6', marginBottom: '1rem', color: 'var(--text-main)' }}>
-              "The Blushing Pink Tulip crochet is absolutely stunning! The packaging was so neat, and it makes my study desk look extremely cozy. I also ordered Luffys Gear 5 canvas which looks amazing in UV light. Highly recommend!"
-            </p>
-            <strong style={{ display: 'block', fontSize: '0.95rem' }}>- Ritika Sharma, Pune</strong>
-          </div>
         </div>
       </section>
 
