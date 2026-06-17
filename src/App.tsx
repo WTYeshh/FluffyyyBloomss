@@ -217,6 +217,18 @@ function App() {
         <p style={{ fontSize: '0.75rem', opacity: 0.7 }}>
           &copy; {new Date().getFullYear()} FluffyyyBloomss. All rights reserved.
         </p>
+        {/* Hover-reveal creator credit */}
+        <div className="footer-dev-credit">
+          <span className="footer-dev-sparkle">✦</span>
+          <a
+            href="https://itsyesh.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-dev-label"
+          >
+            Designed &amp; developed by itsyesh.in
+          </a>
+        </div>
       </footer>
 
       {/* Overlays / Modals */}

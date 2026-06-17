@@ -1092,3 +1092,50 @@ button {
     -webkit-backdrop-filter: none;
   }
 }
+
+/* Footer Developer Credit - Hover Reveal */
+.footer-dev-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  cursor: default;
+  position: relative;
+}
+
+.footer-dev-sparkle {
+  font-size: 0.7rem;
+  color: var(--primary);
+  opacity: 0.45;
+  transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  display: inline-block;
+}
+
+.footer-dev-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.4s ease 0.1s, max-width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.footer-dev-credit:hover .footer-dev-sparkle {
+  opacity: 1;
+  transform: rotate(180deg) scale(1.3);
+}
+
+.footer-dev-credit:hover .footer-dev-label {
+  opacity: 0.65;
+  max-width: 200px;
+  pointer-events: auto;
+}
+
+.footer-dev-label:hover {
+  opacity: 1 !important;
+  text-decoration: underline;
+  color: var(--primary);
+}
