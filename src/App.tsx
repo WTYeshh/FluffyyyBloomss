@@ -196,38 +196,40 @@ function App() {
         style={{
           borderTop: '1px solid var(--border)',
           background: 'var(--bg-card)',
-          padding: '3rem 2rem 2rem',
+          padding: '1.5rem 2rem 1.25rem',
           textAlign: 'center',
-          fontSize: '0.9rem',
+          fontSize: '0.85rem',
           color: 'var(--text-muted)'
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--primary)', fontWeight: 'bold' }}>
-          <Heart size={16} fill="var(--primary)" />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem', color: 'var(--primary)', fontWeight: 'bold' }}>
+          <Heart size={14} fill="var(--primary)" />
           <span>FluffyyyBloomss</span>
         </div>
-        <p style={{ marginBottom: '1.5rem', lineHeight: '1.6' }}>
-          Beautiful Handcrafted Flowers, Keychains, and anime canvas art.<br />
-          Made with love & high-quality milk cotton yarn.
+        <p style={{ marginBottom: '0.75rem', lineHeight: '1.5', fontSize: '0.8rem' }}>
+          Beautiful Handcrafted Flowers, Keychains, and anime canvas art.&nbsp;
+          Made with love &amp; high-quality milk cotton yarn.
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '0.75rem', fontWeight: 600, fontSize: '0.8rem' }}>
           <button onClick={() => setView('shop')} style={{ color: 'var(--text-muted)' }}>Shop</button>
           <button onClick={() => setView('cart')} style={{ color: 'var(--text-muted)' }}>Bag</button>
         </div>
-        <p style={{ fontSize: '0.75rem', opacity: 0.7 }}>
-          &copy; {new Date().getFullYear()} FluffyyyBloomss. All rights reserved.
-        </p>
-        {/* Hover-reveal creator credit */}
-        <div className="footer-dev-credit">
-          <span className="footer-dev-sparkle">✦</span>
-          <a
-            href="https://itsyesh.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer-dev-label"
-          >
-            Designed &amp; developed by itsyesh.in
-          </a>
+        {/* Copyright + inline sparkle credit row */}
+        <div className="footer-bottom-row">
+          <p style={{ fontSize: '0.72rem', opacity: 0.7, margin: 0 }}>
+            &copy; {new Date().getFullYear()} FluffyyyBloomss. All rights reserved.
+          </p>
+          <div className="footer-dev-credit">
+            <span className="footer-dev-sparkle">✦</span>
+            <a
+              href="https://itsyesh.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-dev-label"
+            >
+              Designed &amp; developed by itsyesh.in
+            </a>
+          </div>
         </div>
       </footer>
 
