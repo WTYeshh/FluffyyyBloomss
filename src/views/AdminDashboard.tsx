@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download } from 'lucide-react';
 import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
@@ -180,6 +180,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
     setImageUploadBase64('');
     setImageUrl('');
     setFormError('');
+  };
+
+  const handleExportJSON = () => {
+    const exportData = products.map(p => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      category: p.category,
+      price: p.price,
+      originalPrice: p.originalPrice,
+      image: p.image,
+      isAvailable: p.isAvailable !== false
+    }));
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "products.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
   };
 
   // Stats Calculations
@@ -551,10 +571,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
 
           {/* List of Products */}
           <div className="admin-content-card">
-            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Package size={20} />
-              <span>Catalog List ({products.length})</span>
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                <Package size={20} />
+                <span>Catalog List ({products.length})</span>
+              </h2>
+              <button 
+                onClick={handleExportJSON}
+                className="tab-btn" 
+                style={{ 
+                  margin: 0, 
+                  fontSize: '0.82rem', 
+                  padding: '0.5rem 1rem', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.4rem',
+                  borderColor: 'var(--primary)',
+                  color: 'var(--primary)',
+                  fontWeight: 'bold'
+                }}
+                title="Download updated products.json for Git commit"
+              >
+                <Download size={14} />
+                <span>Export products.json</span>
+              </button>
+            </div>
 
             <div className="table-wrapper">
               <table className="admin-table">
