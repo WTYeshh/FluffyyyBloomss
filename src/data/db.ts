@@ -58,7 +58,7 @@ export const initDB = () => {
   
   const defaultAdmin = {
     id: 'admin-1',
-    name: 'Secret Admin',
+    name: 'Admin',
     email: 'yeshwanthkg@gmail.com',
     password: 'Vinod Jangir',
     isAdmin: true

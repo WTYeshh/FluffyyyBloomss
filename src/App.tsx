@@ -213,24 +213,6 @@ function App() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1.5rem', fontWeight: 600 }}>
           <button onClick={() => setView('shop')} style={{ color: 'var(--text-muted)' }}>Shop</button>
           <button onClick={() => setView('cart')} style={{ color: 'var(--text-muted)' }}>Bag</button>
-          <button 
-            onClick={() => {
-              if (currentUser?.isAdmin) {
-                setView('admin');
-              } else {
-                setIsAuthOpen(true);
-              }
-            }} 
-            style={{ 
-              color: 'var(--text-muted)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.25rem' 
-            }}
-          >
-            <Lock size={12} />
-            <span>Admin Entrance</span>
-          </button>
         </div>
         <p style={{ fontSize: '0.75rem', opacity: 0.7 }}>
           &copy; {new Date().getFullYear()} FluffyyyBloomss. All rights reserved.

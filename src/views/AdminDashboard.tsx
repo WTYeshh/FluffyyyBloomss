@@ -238,7 +238,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
       {/* Dashboard Top Header */}
       <div className="admin-header">
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Secret Admin Dashboard</h1>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Admin Dashboard</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginTop: '0.25rem' }}>
             Store inventory, orders, and sales performance analytics.
           </p>
