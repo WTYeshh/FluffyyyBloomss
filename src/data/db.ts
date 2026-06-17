@@ -47,7 +47,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 399,
     originalPrice: 699,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.42 PM.jpeg',
+    image: '/images/flower-1.jpeg',
     isAvailable: true,
   },
   {
@@ -57,7 +57,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 299,
     originalPrice: 599,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.43 PM.jpeg',
+    image: '/images/flower-2.jpeg',
     isAvailable: true,
   },
   {
@@ -67,7 +67,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 499,
     originalPrice: 999,
-    image: '/images/WhatsApp Image 2026-06-17 6.28.44 PM.jpeg',
+    image: '/images/flower-3.jpeg',
     isAvailable: true,
   },
   {
@@ -77,7 +77,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 799,
     originalPrice: 1299,
-    image: '/images/WhatsApp Image 2026-06gf17 at 6.28.44 PM.jpeg',
+    image: '/images/flower-4.jpeg',
     isAvailable: true,
   },
   {
@@ -87,7 +87,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 499,
     originalPrice: 899,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.45 PM.jpeg',
+    image: '/images/flower-5.jpeg',
     isAvailable: true,
   },
   {
@@ -97,7 +97,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 699,
     originalPrice: 1199,
-    image: '/images/WhatsApp Image 2026-07 at 6.28.45 PM.jpeg',
+    image: '/images/flower-6.jpeg',
     isAvailable: true,
   },
   {
@@ -107,7 +107,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 449,
     originalPrice: 799,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.46 PM.jpeg',
+    image: '/images/flower-7.jpeg',
     isAvailable: true,
   },
   {
@@ -117,7 +117,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'flowers',
     price: 899,
     originalPrice: 1499,
-    image: '/images/WhatsApp Image 2026-weat 6.28.46 PM.jpeg',
+    image: '/images/flower-8.jpeg',
     isAvailable: true,
   },
 
@@ -129,7 +129,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 199,
     originalPrice: 399,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.47 PM.jpeg',
+    image: '/images/keychain-1.jpeg',
     isAvailable: true,
   },
   {
@@ -139,7 +139,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 179,
     originalPrice: 349,
-    image: '/images/WhatsApp Image 2026-06-gt 6.28.47 PM.jpeg',
+    image: '/images/keychain-2.jpeg',
     isAvailable: true,
   },
   {
@@ -149,7 +149,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 249,
     originalPrice: 499,
-    image: '/images/WhatsApp][ge 2026-06-17 at 6.28.47 PM.jpeg',
+    image: '/images/keychain-3.jpeg',
     isAvailable: true,
   },
   {
@@ -159,7 +159,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 199,
     originalPrice: 399,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.47thuuu (1).jpeg',
+    image: '/images/keychain-4.jpeg',
     isAvailable: true,
   },
   {
@@ -169,7 +169,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 189,
     originalPrice: 349,
-    image: '/images/WhatsApp Image 2026-06-17 qwawset 6.28.48 PM.jpeg',
+    image: '/images/keychain-5.jpeg',
     isAvailable: true,
   },
   {
@@ -179,7 +179,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 149,
     originalPrice: 299,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.28.49 PM.jpeg',
+    image: '/images/keychain-6.jpeg',
     isAvailable: true,
   },
   {
@@ -189,7 +189,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 299,
     originalPrice: 599,
-    image: '/images/WhatsApp-7 at 6.28.49 PM.jpeg',
+    image: '/images/keychain-7.jpeg',
     isAvailable: true,
   },
   {
@@ -199,7 +199,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'keychains',
     price: 199,
     originalPrice: 399,
-    image: '/images/WhatsApp Image 2026-06-17 at =-28.49 PM.jpeg',
+    image: '/images/keychain-8.jpeg',
     isAvailable: true,
   },
 
@@ -211,7 +211,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'art',
     price: 999,
     originalPrice: 1999,
-    image: '/images/WhatsApp Image 2026-06-17 agfds48 PM.jpeg',
+    image: '/images/art-1.jpeg',
     isAvailable: true,
   },
   {
@@ -221,7 +221,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'art',
     price: 1299,
     originalPrice: 2499,
-    image: '/images/WhatsApp Image 2026-06-17 at  PM.jpeg',
+    image: '/images/art-2.jpeg',
     isAvailable: true,
   },
   {
@@ -231,17 +231,17 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'art',
     price: 899,
     originalPrice: 1799,
-    image: '/images/WhatsApp Image 2026-06-17 at 6.285 PM.jpeg',
+    image: '/images/art-3.jpeg',
     isAvailable: true,
   },
   {
     id: 'art-4',
-    title: 'Trafalgar Law Room Neon Painting',
+    title: 'Trafalgar Law Neon Painting',
     description: 'Fluorescent acrylic art of Trafalgar Law activating his ROOM sphere. Glows beautifully under UV light.',
     category: 'art',
     price: 1499,
     originalPrice: 2999,
-    image: '/images/WhatsApp Image 2026-06-17 at hg44 PM.jpeg',
+    image: '/images/art-4.jpeg',
     isAvailable: true,
   },
   {
@@ -251,7 +251,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'art',
     price: 999,
     originalPrice: 1999,
-    image: '/images/WhatsApp Image 2026-06-17 at ytrPM.jpeg',
+    image: '/images/art-5.jpeg',
     isAvailable: true,
   },
   {
@@ -261,7 +261,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'art',
     price: 799,
     originalPrice: 1599,
-    image: '/images/WhatsApp Image 2sdvb at 6.28.46 PM.jpeg',
+    image: '/images/art-6.jpeg',
     isAvailable: true,
   },
   {
@@ -271,7 +271,7 @@ const INITIAL_PRODUCTS: Product[] = [
     category: 'art',
     price: 699,
     originalPrice: 1499,
-    image: '/images/WhatsApp Ima[pojhg 2026-06-17 at 6.28.46 PM.jpeg',
+    image: '/images/art-7.jpeg',
     isAvailable: true,
   }
 ];
