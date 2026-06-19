@@ -7,8 +7,9 @@ interface StorefrontProps {
   products: Product[];
   onAddToCart: (product: Product, e: React.MouseEvent) => void;
   onViewDetails: (product: Product) => void;
-  activeCategory: 'all' | 'flowers' | 'keychains' | 'art';
-  setActiveCategory: (category: 'all' | 'flowers' | 'keychains' | 'art') => void;
+  activeCategory: 'all' | 'single' | 'bouquet' | 'keychains' | 'accessories';
+  setActiveCategory: (category: 'all' | 'single' | 'bouquet' | 'keychains' | 'accessories') => void;
+  cartItems: { product: Product; quantity: number }[];
 }
 
 export const Storefront: React.FC<StorefrontProps> = ({
@@ -16,7 +17,8 @@ export const Storefront: React.FC<StorefrontProps> = ({
   onAddToCart,
   onViewDetails,
   activeCategory,
-  setActiveCategory
+  setActiveCategory,
+  cartItems
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('default');
@@ -43,18 +45,20 @@ export const Storefront: React.FC<StorefrontProps> = ({
 
   const getCategoryTitle = () => {
     switch (activeCategory) {
-      case 'flowers': return 'Eternal Blossoms';
+      case 'single': return 'Single Eternal Flowers';
+      case 'bouquet': return 'Handcrafted Flower Bouquets';
       case 'keychains': return 'Amigurumi Buddies';
-      case 'art': return 'Straw Hat Gallery';
+      case 'accessories': return 'Charming Accessories';
       default: return 'Handcrafted Collections';
     }
   };
 
   const getCategorySub = () => {
     switch (activeCategory) {
-      case 'flowers': return 'Elegant hand-knit flower pots & crochet bouquets, crafted with precision using premium cotton fibers.';
+      case 'single': return 'Elegant hand-knit single flower stems, crafted with precision using premium cotton fibers.';
+      case 'bouquet': return 'Lush, beautiful flower bouquets wrapped and designed to show hand-crafted excellence.';
       case 'keychains': return 'Cute, plush amigurumi companions. Stuffed with love to accompany your keys, bags, and backpacks.';
-      case 'art': return 'High-contrast anime themed paintings and woodwork engravings capturing your favorite One Piece moments.';
+      case 'accessories': return 'Beautiful handmade daily accessories including canvas art, keychains, and bookmarks.';
       default: return 'Explore our boutique of handcrafted creations. Each item is unique, durable, and made with absolute care.';
     }
   };
@@ -90,22 +94,28 @@ export const Storefront: React.FC<StorefrontProps> = ({
           All Handcrafted
         </button>
         <button
-          className={`tab-btn ${activeCategory === 'flowers' ? 'active' : ''}`}
-          onClick={() => setActiveCategory('flowers')}
+          className={`tab-btn ${activeCategory === 'single' ? 'active' : ''}`}
+          onClick={() => setActiveCategory('single')}
         >
-          Crochet Flowers
+          Single Flower
+        </button>
+        <button
+          className={`tab-btn ${activeCategory === 'bouquet' ? 'active' : ''}`}
+          onClick={() => setActiveCategory('bouquet')}
+        >
+          Flower Bouquet
         </button>
         <button
           className={`tab-btn ${activeCategory === 'keychains' ? 'active' : ''}`}
           onClick={() => setActiveCategory('keychains')}
         >
-          Cute Keychains
+          Keychains
         </button>
         <button
-          className={`tab-btn ${activeCategory === 'art' ? 'active' : ''}`}
-          onClick={() => setActiveCategory('art')}
+          className={`tab-btn ${activeCategory === 'accessories' ? 'active' : ''}`}
+          onClick={() => setActiveCategory('accessories')}
         >
-          One Piece Art
+          Accessories
         </button>
       </div>
 
@@ -169,14 +179,18 @@ export const Storefront: React.FC<StorefrontProps> = ({
       {/* Product Grid */}
       {sortedProducts.length > 0 ? (
         <section className="product-grid">
-          {sortedProducts.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={onAddToCart}
-              onViewDetails={onViewDetails}
-            />
-          ))}
+          {sortedProducts.map(product => {
+            const quantity = cartItems.find(item => item.product.id === product.id)?.quantity || 0;
+            return (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={onAddToCart}
+                onViewDetails={onViewDetails}
+                cartQuantity={quantity}
+              />
+            );
+          })}
         </section>
       ) : (
         <div className="text-center" style={{ padding: '6rem 2rem', color: 'var(--text-muted)' }}>

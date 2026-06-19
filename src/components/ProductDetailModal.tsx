@@ -15,9 +15,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
 
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
-      case 'flowers': return 'Handcrafted Flower';
+      case 'single': return 'Single Flower';
+      case 'bouquet': return 'Flower Bouquet';
       case 'keychains': return 'Cute Keychain';
-      case 'art': return 'One Piece Art';
+      case 'accessories': return 'Accessories';
       default: return cat;
     }
   };

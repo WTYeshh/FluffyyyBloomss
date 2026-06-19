@@ -21,7 +21,7 @@ const CART_STORAGE_KEY = 'fluffy_bloom_cart';
 
 function App() {
   const [currentView, setView] = useState<string>('home');
-  const [activeCategory, setActiveCategory] = useState<'all' | 'flowers' | 'keychains' | 'art'>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'single' | 'bouquet' | 'keychains' | 'accessories'>('all');
   const [products, setProducts] = useState<Product[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -142,6 +142,7 @@ function App() {
             setActiveCategory={setActiveCategory}
             onAddToCart={handleAddToCart}
             onViewDetails={(prod) => setSelectedProduct(prod)}
+            cartItems={cartItems}
           />
         )}
 
@@ -154,6 +155,7 @@ function App() {
             setActiveCategory={(cat) => {
               setActiveCategory(cat);
             }}
+            cartItems={cartItems}
           />
         )}
 

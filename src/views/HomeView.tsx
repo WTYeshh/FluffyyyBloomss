@@ -1,13 +1,15 @@
 import React from 'react';
-import { Heart, Flower, Sparkles, ArrowRight } from 'lucide-react';
+import { Heart, Flower, Sparkles, ArrowRight, Gift } from 'lucide-react';
+import { ProductCard } from '../components/ProductCard';
 import type { Product } from '../data/db';
 
 interface HomeViewProps {
   products: Product[];
   setView: (view: string) => void;
-  setActiveCategory: (category: 'all' | 'flowers' | 'keychains' | 'art') => void;
+  setActiveCategory: (category: 'all' | 'single' | 'bouquet' | 'keychains' | 'accessories') => void;
   onAddToCart: (product: Product, e: React.MouseEvent) => void;
   onViewDetails: (product: Product) => void;
+  cartItems: { product: Product; quantity: number }[];
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -15,12 +17,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
   setView,
   setActiveCategory,
   onAddToCart,
-  onViewDetails
+  onViewDetails,
+  cartItems
 }) => {
   // Grab a few products for the featured/bestseller row
   const bestsellers = products.slice(0, 4);
 
-  const handleNavigateCategory = (cat: 'flowers' | 'keychains' | 'art') => {
+  const handleNavigateCategory = (cat: 'single' | 'bouquet' | 'keychains' | 'accessories') => {
     setActiveCategory(cat);
     setView('shop');
   };
@@ -88,7 +91,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             zIndex: 1
           }}
         >
-          Welcome to **FluffyyyBloomss**. Every flower pot, cute amigurumi animal, and canvas painting is custom made by hand with absolute care and top-tier yarn.
+          Welcome to *FluffyyyBloomss*. Every flower pot, cute amigurumi animal, and canvas painting is custom made by hand with absolute care and top-tier yarn.
         </p>
 
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', zIndex: 1, marginTop: '1rem' }}>
@@ -120,14 +123,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div 
           style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
             gap: '2rem' 
           }}
         >
-          {/* Card: Flowers */}
+          {/* Card: Single Flower */}
           <div 
             className="product-card" 
-            onClick={() => handleNavigateCategory('flowers')}
+            onClick={() => handleNavigateCategory('single')}
             style={{ cursor: 'pointer', padding: '2.25rem', background: 'rgba(255, 253, 252, 0.75)', border: '1px solid rgba(220, 185, 180, 0.3)' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
@@ -135,17 +138,43 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <Flower size={32} />
               </div>
               <span style={{ fontSize: '0.75rem', fontWeight: 'bold', background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', padding: '2px 8px', borderRadius: '10px' }}>
-                Serif Aesthetic
+                Single
               </span>
             </div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.75rem', fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}>
-              Eternal Crochet Florals
+              Single Flower
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-              Detailed tulips, daisies, lilies, and customized lavender bouquets wrapped in brown packing wrap. Never fades, no watering required.
+              Delicate individual stems of tulips, daisies, and roses. Perfect small accents or custom combinations.
             </p>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', color: '#ec4899', marginTop: 'auto' }}>
               <span>View Flowers</span>
+              <ArrowRight size={14} />
+            </span>
+          </div>
+
+          {/* Card: Flower Bouquet */}
+          <div 
+            className="product-card" 
+            onClick={() => handleNavigateCategory('bouquet')}
+            style={{ cursor: 'pointer', padding: '2.25rem', background: 'rgba(254, 252, 250, 0.75)', border: '1px solid rgba(239, 180, 180, 0.3)' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              <div style={{ color: '#f43f5e', background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px' }}>
+                <Gift size={32} />
+              </div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', background: 'rgba(244, 63, 94, 0.1)', color: '#f43f5e', padding: '2px 8px', borderRadius: '10px' }}>
+                Bouquets
+              </span>
+            </div>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.75rem', fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}>
+              Flower Bouquet
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              Lush, hand-wrapped arrangements of tulips, lavender, and sunflowers. Uniquely crafted bouquets to surprise your loved ones.
+            </p>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', color: '#f43f5e', marginTop: 'auto' }}>
+              <span>View Bouquets</span>
               <ArrowRight size={14} />
             </span>
           </div>
@@ -161,11 +190,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <Heart size={32} />
               </div>
               <span style={{ fontSize: '0.75rem', fontWeight: 'bold', background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', padding: '2px 8px', borderRadius: '10px' }}>
-                Rounded Cute
+                Cute
               </span>
             </div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.75rem', fontFamily: "'Fredoka', sans-serif" }}>
-              Amigurumi Keychains
+              Keychains
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
               Chubby kittens, dinosaurs, bees, and smiling octopuses. Stuffed with micro-fibers, attached to a premium metal keyclasp.
@@ -176,28 +205,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </span>
           </div>
 
-          {/* Card: One Piece Art */}
+          {/* Card: Accessories */}
           <div 
             className="product-card" 
-            onClick={() => handleNavigateCategory('art')}
+            onClick={() => handleNavigateCategory('accessories')}
             style={{ cursor: 'pointer', padding: '2.25rem', background: 'rgba(254, 252, 250, 0.75)', border: '1px solid rgba(239, 180, 180, 0.3)' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-              <div style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '0.75rem', borderRadius: '12px' }}>
+              <div style={{ color: '#d28c2e', background: 'rgba(210, 140, 46, 0.1)', padding: '0.75rem', borderRadius: '12px' }}>
                 <Sparkles size={32} />
               </div>
-              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '2px 8px', borderRadius: '10px' }}>
-                Dark Bold Gold
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', background: 'rgba(210, 140, 46, 0.1)', color: '#d28c2e', padding: '2px 8px', borderRadius: '10px' }}>
+                Accessories
               </span>
             </div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.75rem' }}>
-              One Piece Canvas Art
+              Accessories
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-              Vibrant acrylic sketches, neon UV glow-paint canvas, and burnt wood engravings illustrating Luffy, Zoro, Shanks, and crew icons.
+              Vibrant acrylic sketches, custom keychains, bookmarks, and canvas painting designs illustrating daily aesthetics.
             </p>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', color: '#ef4444', marginTop: 'auto' }}>
-              <span>View Anime Art</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', color: '#d28c2e', marginTop: 'auto' }}>
+              <span>View Accessories</span>
               <ArrowRight size={14} />
             </span>
           </div>
@@ -223,33 +252,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div 
           style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
             gap: '2rem' 
           }}
         >
           {bestsellers.map(product => {
-            const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+            const quantity = cartItems.find(item => item.product.id === product.id)?.quantity || 0;
             return (
-              <div key={product.id} className="product-card" onClick={() => onViewDetails(product)} style={{ cursor: 'pointer' }}>
-                <span className="badge-sale">{discount}% OFF</span>
-                <div className="product-img-container">
-                  <img src={product.image} alt={product.title} className="product-img" />
-                </div>
-                <div className="product-details">
-                  <span className="product-cat" style={{ fontSize: '0.7rem' }}>{product.category}</span>
-                  <h3 className="product-title" style={{ fontSize: '1.05rem' }}>{product.title}</h3>
-                  <div className="product-price-section">
-                    <span className="current-price" style={{ fontSize: '1.2rem' }}>₹{product.price}</span>
-                    <span className="scratch-price" style={{ fontSize: '0.8rem' }}>₹{product.originalPrice}</span>
-                  </div>
-                  <button 
-                    className="add-cart-btn"
-                    onClick={(e) => onAddToCart(product, e)}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={onAddToCart}
+                onViewDetails={onViewDetails}
+                cartQuantity={quantity}
+              />
             );
           })}
         </div>
@@ -258,4 +274,5 @@ export const HomeView: React.FC<HomeViewProps> = ({
     </div>
   );
 };
+
 export default HomeView;

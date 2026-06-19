@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   title: string;
   description: string;
-  category: 'flowers' | 'keychains' | 'art';
+  category: 'single' | 'bouquet' | 'keychains' | 'accessories';
   price: number;
   originalPrice: number;
   image: string;
@@ -122,16 +122,33 @@ export const syncProducts = async (): Promise<Product[]> => {
     const response = await fetch(url);
     if (response.ok) {
       const data = await response.json();
-      const parsedProducts: Product[] = data.map((item: any) => ({
-        id: String(item.id || ''),
-        title: String(item.title || ''),
-        description: String(item.description || ''),
-        category: String(item.category || 'flowers') as any,
-        price: Number(item.price || 0),
-        originalPrice: Number(item.originalPrice || 0),
-        image: String(item.image || ''),
-        isAvailable: item.isAvailable === true || item.isAvailable === 'true' || item.isAvailable === 1 || item.isAvailable === '1'
-      }));
+      const parsedProducts: Product[] = data.map((item: any) => {
+        let cat = String(item.category || 'single').toLowerCase().trim();
+        // Map old spreadsheet categories to the new ones
+        if (cat === 'flowers') {
+          const title = String(item.title || '').toLowerCase();
+          if (title.includes('bouquet') || title.includes('set') || title.includes('bunch') || title.includes('pack')) {
+            cat = 'bouquet';
+          } else {
+            cat = 'single';
+          }
+        } else if (cat === 'art') {
+          cat = 'accessories';
+        } else if (cat !== 'single' && cat !== 'bouquet' && cat !== 'keychains' && cat !== 'accessories') {
+          cat = 'single'; // default fallback
+        }
+
+        return {
+          id: String(item.id || ''),
+          title: String(item.title || ''),
+          description: String(item.description || ''),
+          category: cat as any,
+          price: Number(item.price || 0),
+          originalPrice: Number(item.originalPrice || 0),
+          image: String(item.image || ''),
+          isAvailable: item.isAvailable === true || item.isAvailable === 'true' || item.isAvailable === 1 || item.isAvailable === '1'
+        };
+      });
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(parsedProducts));
       return parsedProducts;
     }

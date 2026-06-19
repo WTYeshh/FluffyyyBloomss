@@ -49,7 +49,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<'flowers' | 'keychains' | 'art'>('flowers');
+  const [category, setCategory] = useState<'single' | 'bouquet' | 'keychains' | 'accessories'>('single');
   const [price, setPrice] = useState('');
   const [originalPrice, setOriginalPrice] = useState('');
   const [imageType, setImageType] = useState<'upload' | 'select' | 'url'>('upload');
@@ -195,7 +195,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     setEditingId(null);
     setTitle('');
     setDescription('');
-    setCategory('flowers');
+    setCategory('single');
     setPrice('');
     setOriginalPrice('');
     setImageType('upload');
@@ -449,9 +449,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                     onChange={(e) => setCategory(e.target.value as any)}
                     style={{ cursor: 'pointer' }}
                   >
-                    <option value="flowers">Crochet Flowers</option>
-                    <option value="keychains">Cute Keychains</option>
-                    <option value="art">One Piece Art</option>
+                    <option value="single">Single Flower</option>
+                    <option value="bouquet">Flower Bouquet</option>
+                    <option value="keychains">Keychains</option>
+                    <option value="accessories">Accessories</option>
                   </select>
                 </div>
 
@@ -753,20 +754,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {['flowers', 'keychains', 'art'].map(cat => {
+                {['single', 'bouquet', 'keychains', 'accessories'].map(cat => {
                   const count = categorySalesMap[cat] || 0;
                   const percent = totalSalesCount > 0 ? Math.round((count / totalSalesCount) * 100) : 0;
                   
+                  const getProgressBarColor = (c: string) => {
+                    switch (c) {
+                      case 'single': return '#ec4899';
+                      case 'bouquet': return '#f43f5e';
+                      case 'keychains': return '#8b5cf6';
+                      case 'accessories': return '#d28c2e';
+                      default: return 'var(--primary)';
+                    }
+                  };
+
+                  const getDisplayName = (c: string) => {
+                    switch (c) {
+                      case 'single': return 'Single Flower';
+                      case 'bouquet': return 'Flower Bouquet';
+                      case 'keychains': return 'Keychains';
+                      case 'accessories': return 'Accessories';
+                      default: return c;
+                    }
+                  };
+
                   return (
                     <div key={cat} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                        <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>{cat}</span>
+                        <span style={{ fontWeight: 'bold' }}>{getDisplayName(cat)}</span>
                         <span style={{ color: 'var(--text-muted)' }}>{count} items ({percent}%)</span>
                       </div>
                       <div style={{ background: 'var(--border)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                         <div 
                           style={{ 
-                            background: cat === 'flowers' ? '#ec4899' : cat === 'keychains' ? '#8b5cf6' : '#ef4444', 
+                            background: getProgressBarColor(cat), 
                             height: '100%', 
                             width: `${percent}%`,
                             borderRadius: '4px'
