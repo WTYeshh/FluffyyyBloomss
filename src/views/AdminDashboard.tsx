@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock } from 'lucide-react';
 import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
@@ -64,6 +64,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [registeredUsers, setRegisteredUsers] = useState<any[]>(() => getUsers().filter((u: any) => !u.isAdmin).reverse().slice(0, 15));
   const [shippingFeeInput, setShippingFeeInput] = useState(getShippingFee().toString());
   const [shippingThresholdInput, setShippingThresholdInput] = useState(getShippingThreshold().toString());
+  const [isShippingLocked, setIsShippingLocked] = useState(true);
 
   // Handle local image upload to Base64
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,11 +224,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     const threshold = Number(shippingThresholdInput);
     if (isNaN(fee) || fee < 0 || isNaN(threshold) || threshold < 0) {
       alert("Please enter valid positive numbers for shipping rates.");
-      return;
+      return false;
     }
     setShippingFee(fee);
     setShippingThreshold(threshold);
     alert("Shipping rates successfully updated!");
+    return true;
   };
 
   const handleToggleFeatured = (product: Product) => {
@@ -799,7 +801,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                   placeholder="e.g. 50"
                   value={shippingFeeInput}
                   onChange={(e) => setShippingFeeInput(e.target.value)}
-                  style={{ fontSize: '0.9rem' }}
+                  style={{ fontSize: '0.9rem', opacity: isShippingLocked ? 0.6 : 1 }}
+                  disabled={isShippingLocked}
                 />
               </div>
               <div style={{ flex: '1 1 200px' }}>
@@ -810,11 +813,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                   placeholder="e.g. 1000"
                   value={shippingThresholdInput}
                   onChange={(e) => setShippingThresholdInput(e.target.value)}
-                  style={{ fontSize: '0.9rem' }}
+                  style={{ fontSize: '0.9rem', opacity: isShippingLocked ? 0.6 : 1 }}
+                  disabled={isShippingLocked}
                 />
               </div>
-              <button onClick={handleSaveShippingConfig} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content', background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
-                Save Shipping Rates
+              {isShippingLocked && (
+                <button
+                  type="button"
+                  onClick={() => setIsShippingLocked(false)}
+                  style={{
+                    width: 'auto',
+                    padding: '0.75rem 1rem',
+                    height: 'fit-content',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    border: '1px solid var(--border)',
+                    borderRadius: '4px',
+                    background: 'var(--card-bg)',
+                    color: 'var(--text-main)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem'
+                  }}
+                  title="Edit shipping rates"
+                >
+                  <Edit2 size={14} />
+                  <span>Edit</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (handleSaveShippingConfig()) {
+                    setIsShippingLocked(true);
+                  }
+                }}
+                disabled={isShippingLocked}
+                className="btn-primary"
+                style={{
+                  width: 'auto',
+                  padding: '0.75rem 1.5rem',
+                  height: 'fit-content',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: isShippingLocked ? '#9ca3af' : '#10b981',
+                  boxShadow: isShippingLocked ? 'none' : '0 4px 12px rgba(16,185,129,0.25)',
+                  cursor: isShippingLocked ? 'not-allowed' : 'pointer',
+                  opacity: isShippingLocked ? 0.6 : 1,
+                  color: '#ffffff'
+                }}
+              >
+                <Lock size={14} />
+                <span>Save the discount input</span>
               </button>
             </div>
           </div>
