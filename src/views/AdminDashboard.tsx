@@ -1340,6 +1340,28 @@ function doPost(e) {
 
     return ContentService.createTextOutput(JSON.stringify({ success: true }))
       .setMimeType(ContentService.MimeType.JSON);
+  } else if (action === 'sendEmail') {
+    var recipient = payload.recipient;
+    var subject = payload.subject;
+    var body = payload.body;
+    var isHtml = payload.isHtml;
+
+    if (isHtml) {
+      MailApp.sendEmail({
+        to: recipient,
+        subject: subject,
+        htmlBody: body
+      });
+    } else {
+      MailApp.sendEmail({
+        to: recipient,
+        subject: subject,
+        body: body
+      });
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
