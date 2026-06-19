@@ -71,28 +71,20 @@ function App() {
   }, [welcomeToast]);
 
   const triggerCrackerBurst = () => {
-    const duration = 2.5 * 1000;
-    const end = Date.now() + duration;
-
-    const frame = () => {
-      confetti({
-        particleCount: 4,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.8 }
-      });
-      confetti({
-        particleCount: 4,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.8 }
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
+    // Small quick pop of 4 particles from left side
+    confetti({
+      particleCount: 4,
+      angle: 60,
+      spread: 30,
+      origin: { x: 0.1, y: 0.8 }
+    });
+    // Small quick pop of 4 particles from right side
+    confetti({
+      particleCount: 4,
+      angle: 120,
+      spread: 30,
+      origin: { x: 0.9, y: 0.8 }
+    });
   };
 
   const showWelcomeToast = (name: string, action: 'login' | 'register' | 'order') => {
