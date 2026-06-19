@@ -53,6 +53,16 @@ function App() {
         console.error('Failed to parse cart items', e);
       }
     }
+
+    // Periodically sync products from Google Sheets every 60 seconds
+    // so any device already open picks up new products added from another device
+    const syncInterval = setInterval(() => {
+      syncProducts().then(syncedProducts => {
+        setProducts(syncedProducts);
+      });
+    }, 60000);
+
+    return () => clearInterval(syncInterval);
   }, []);
 
   // Save cart to local storage when it updates

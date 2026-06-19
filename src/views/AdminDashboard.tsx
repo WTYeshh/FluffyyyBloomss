@@ -33,7 +33,7 @@ const LOCAL_IMAGES = [
 
 interface AdminDashboardProps {
   products: Product[];
-  onProductsUpdated: () => void;
+  onProductsUpdated: (forceSync?: boolean) => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initialProducts, onProductsUpdated }) => {
@@ -160,7 +160,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     try {
       const result = await saveProduct(targetProduct);
       setProducts(getProducts());
-      onProductsUpdated();
+      // Force a re-sync from Google Sheets so App.tsx also reflects the latest cloud state
+      onProductsUpdated(result.sheetSynced);
       
       const pTitle = targetProduct.title;
       resetForm();
@@ -204,7 +205,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     if (window.confirm('Are you sure you want to delete this product?')) {
       deleteProduct(id).then(() => {
         setProducts(getProducts());
-        onProductsUpdated();
+        onProductsUpdated(true); // Force re-sync so deletion is reflected across devices
       });
     }
   };
@@ -295,9 +296,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       ...product,
       isFeatured: !product.isFeatured
     };
-    saveProduct(updated).then(() => {
+    saveProduct(updated).then((result) => {
       setProducts(getProducts());
-      onProductsUpdated();
+      onProductsUpdated(result.sheetSynced);
     });
   };
 
@@ -306,9 +307,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       ...product,
       isAvailable: !product.isAvailable
     };
-    saveProduct(updated).then(() => {
+    saveProduct(updated).then((result) => {
       setProducts(getProducts());
-      onProductsUpdated();
+      onProductsUpdated(result.sheetSynced);
     });
   };
 
