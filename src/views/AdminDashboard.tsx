@@ -61,7 +61,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [userSheetUrlInput, setUserSheetUrlInput] = useState(getUserSheetUrl());
   const [showUserScriptModal, setShowUserScriptModal] = useState(false);
-  const [registeredUsers, setRegisteredUsers] = useState<any[]>(() => getUsers().filter((u: any) => !u.isAdmin));
+  const [registeredUsers, setRegisteredUsers] = useState<any[]>(() => getUsers().filter((u: any) => !u.isAdmin).reverse().slice(0, 15));
   const [shippingFeeInput, setShippingFeeInput] = useState(getShippingFee().toString());
   const [shippingThresholdInput, setShippingThresholdInput] = useState(getShippingThreshold().toString());
 
@@ -302,7 +302,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
             className={`admin-tab ${activeSubTab === 'orders' ? 'active' : ''}`}
             onClick={() => setActiveSubTab('orders')}
           >
-            Orders List ({orders.length})
+            Orders Queue ({Math.min(orders.length, 15)})
           </button>
           <button
             className={`admin-tab ${activeSubTab === 'products' ? 'active' : ''}`}
@@ -341,7 +341,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map(order => (
+                  {orders.slice(0, 15).map(order => (
                     <tr key={order.id}>
                       <td>
                         <strong style={{ display: 'block', fontSize: '0.95rem' }}>#{order.id}</strong>
@@ -779,6 +779,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
               </table>
             </div>
           </div>
+
+          {/* ── SECTION 3: Shipping Fees & Offers Configuration ── */}
+          <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '2px solid var(--border)', paddingTop: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TrendingUp size={18} style={{ color: '#10b981' }} />
+              <span>🚚 Shipping Rates & Offers Configuration</span>
+            </h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              Configure the shipping fees charged to customers, and define the threshold amount above which shipping is completely free.
+            </p>
+
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1 1 200px' }}>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>Default Shipping Fee (₹)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  placeholder="e.g. 50"
+                  value={shippingFeeInput}
+                  onChange={(e) => setShippingFeeInput(e.target.value)}
+                  style={{ fontSize: '0.9rem' }}
+                />
+              </div>
+              <div style={{ flex: '1 1 200px' }}>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>Free Shipping Min Order Threshold (₹)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  placeholder="e.g. 1000"
+                  value={shippingThresholdInput}
+                  onChange={(e) => setShippingThresholdInput(e.target.value)}
+                  style={{ fontSize: '0.9rem' }}
+                />
+              </div>
+              <button onClick={handleSaveShippingConfig} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content', background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
+                Save Shipping Rates
+              </button>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -1042,7 +1082,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                   <h4 style={{ fontSize: '1rem', fontWeight: 800 }}>Registered Customers ({registeredUsers.length})</h4>
                   <button
-                    onClick={() => setRegisteredUsers(getUsers().filter((u: any) => !u.isAdmin))}
+                    onClick={() => setRegisteredUsers(getUsers().filter((u: any) => !u.isAdmin).reverse().slice(0, 15))}
                     className="tab-btn"
                     style={{ margin: 0, fontSize: '0.8rem', padding: '0.4rem 0.9rem' }}
                   >
@@ -1076,45 +1116,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                     <p style={{ fontSize: '0.9rem' }}>No customers have signed up yet. Once they do, they'll appear here.</p>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* ── SECTION 3: Shipping Fees & Offers Configuration ── */}
-            <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '2px solid var(--border)', paddingTop: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <TrendingUp size={18} style={{ color: '#10b981' }} />
-                <span>🚚 Shipping Rates & Offers Configuration</span>
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-                Configure the shipping fees charged to customers, and define the threshold amount above which shipping is completely free.
-              </p>
-
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 200px' }}>
-                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Default Shipping Fee (₹)</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    placeholder="e.g. 50"
-                    value={shippingFeeInput}
-                    onChange={(e) => setShippingFeeInput(e.target.value)}
-                    style={{ fontSize: '0.9rem' }}
-                  />
-                </div>
-                <div style={{ flex: '1 1 200px' }}>
-                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Free Shipping Min Order Threshold (₹)</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    placeholder="e.g. 1000"
-                    value={shippingThresholdInput}
-                    onChange={(e) => setShippingThresholdInput(e.target.value)}
-                    style={{ fontSize: '0.9rem' }}
-                  />
-                </div>
-                <button onClick={handleSaveShippingConfig} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content', background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
-                  Save Shipping Rates
-                </button>
               </div>
             </div>
 
