@@ -1746,6 +1746,9 @@ function doGet(e) {
             }} 
             onClick={(e) => e.stopPropagation()}
           >
+            <button className="modal-close" onClick={() => setShowPublishSuccessModal(false)} aria-label="Close modal">
+              <X size={18} />
+            </button>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
               <div 
                 style={{ 

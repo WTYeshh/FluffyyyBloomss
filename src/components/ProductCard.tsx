@@ -88,22 +88,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
             <div
               style={{
                 flexGrow: 1,
-                padding: '0.8rem',
+                padding: '0.6rem 0.4rem',
                 backgroundColor: 'rgba(0,0,0,0.06)',
                 border: '1px solid rgba(0,0,0,0.08)',
                 borderRadius: 'var(--radius-sm)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.4rem',
+                gap: '0.3rem',
                 color: 'var(--text-muted)',
-                fontSize: '0.9rem',
+                fontSize: '0.8rem',
                 fontWeight: 600,
                 userSelect: 'none',
-                cursor: 'default'
+                cursor: 'default',
+                whiteSpace: 'nowrap'
               }}
             >
-              <span>✓ Added to Cart ({cartQuantity})</span>
+              <span>✓ Added ({cartQuantity})</span>
             </div>
             {/* +1 button — only interactive element */}
             <button

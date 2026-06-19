@@ -1119,14 +1119,24 @@ button {
   .admin-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.25rem;
+    gap: 1rem;
   }
   .admin-nav-tabs {
     width: 100%;
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+    scrollbar-width: none;
+  }
+  .admin-nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .admin-tab {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    font-size: 0.88rem;
   }
   .admin-grid {
     grid-template-columns: 1fr;
