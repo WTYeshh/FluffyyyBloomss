@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock, RefreshCw } from 'lucide-react';
 import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
@@ -174,6 +174,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     setOrders(getOrders());
   };
 
+  const handleRefreshOrders = () => {
+    setOrders(getOrders());
+    alert('Dashboard orders and stats successfully refreshed!');
+  };
+
   const handleSendDelayEmail = async (order: Order) => {
     const success = await sendDelayEmail(order);
     if (success) {
@@ -324,9 +329,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       {/* Orders Manager */}
       {activeSubTab === 'orders' && (
         <div className="admin-content-card">
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FileText size={20} />
-            <span>Customer Orders Queue</span>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FileText size={20} />
+              <span>Customer Orders Queue</span>
+            </div>
+            <button
+              onClick={handleRefreshOrders}
+              className="tab-btn"
+              style={{
+                margin: 0,
+                fontSize: '0.8rem',
+                padding: '0.4rem 0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                cursor: 'pointer'
+              }}
+            >
+              <RefreshCw size={12} />
+              <span>Refresh Orders</span>
+            </button>
           </h2>
 
           {orders.length > 0 ? (
@@ -876,6 +899,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       {/* Stats Tab */}
       {activeSubTab === 'stats' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Stats Header with Refresh */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Overview & Stats</h3>
+            <button
+              onClick={handleRefreshOrders}
+              className="tab-btn"
+              style={{
+                margin: 0,
+                fontSize: '0.8rem',
+                padding: '0.4rem 0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                cursor: 'pointer'
+              }}
+            >
+              <RefreshCw size={12} />
+              <span>Refresh Stats</span>
+            </button>
+          </div>
+
           {/* Analytics Summary Row */}
           <div className="analytics-grid">
             <div className="stat-card">
