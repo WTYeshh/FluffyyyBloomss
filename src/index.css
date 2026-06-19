@@ -618,6 +618,14 @@ button {
   box-shadow: 0 6px 16px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.3);
 }
 
+.btn-primary:disabled {
+  background: var(--text-muted) !important;
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* Cart View Layout */
 .cart-container {
   max-width: 1200px;

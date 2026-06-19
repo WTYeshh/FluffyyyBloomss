@@ -60,6 +60,15 @@ export const CartView: React.FC<CartViewProps> = ({
   const shipping = subtotal > 1000 ? 0 : 50;
   const total = subtotal + shipping;
 
+  const isFormValid = 
+    fullName.trim() !== '' &&
+    email.trim().includes('@') &&
+    email.trim().includes('.') &&
+    phone.trim().length === 10 &&
+    address.trim().length >= 10 &&
+    city.trim() !== '' &&
+    pincode.trim().length === 6;
+
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
@@ -560,7 +569,13 @@ export const CartView: React.FC<CartViewProps> = ({
                 </p>
               )}
 
-              <button type="submit" className="btn-primary mt-2" style={{ padding: '1rem' }}>
+              <button 
+                type="submit" 
+                className="btn-primary mt-2" 
+                style={{ padding: '1rem' }} 
+                disabled={!isFormValid}
+                title={!isFormValid ? "Please fill in all shipping details correctly (10-digit mobile, valid email, 6-digit pin code, complete address) to proceed." : "Confirm and place your order"}
+              >
                 {paymentMethod === 'UPI' ? 'Confirm & Place Order (Paid via UPI)' : 'Place Order (Cash on Delivery)'}
               </button>
             </form>
