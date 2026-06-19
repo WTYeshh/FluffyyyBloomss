@@ -51,7 +51,8 @@ const STORAGE_KEYS = {
   USERS: 'fluffy_bloom_users',
   LOGGED_IN_USER: 'fluffy_bloom_logged_in_user',
   GOOGLE_SHEET_URL: 'fluffy_bloom_sheets_url',
-  USER_SHEET_URL: 'fluffy_bloom_user_sheets_url'
+  USER_SHEET_URL: 'fluffy_bloom_user_sheets_url',
+  PASSWORD_RESETS: 'fluffy_bloom_password_resets'
 };
 
 // Initialize DB if empty
@@ -394,4 +395,58 @@ export const updateOrderStatus = (orderId: string, status: 'Pending' | 'Shipped'
     orders[index].status = status;
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
   }
+};
+
+export const generatePasswordResetOTP = async (email: string): Promise<string | null> => {
+  const users = getUsers();
+  const exists = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
+  if (!exists) return null;
+
+  // Generate 6-digit random code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+
+  const resetsStr = localStorage.getItem(STORAGE_KEYS.PASSWORD_RESETS);
+  const resets: any[] = resetsStr ? JSON.parse(resetsStr) : [];
+  
+  // Remove existing resets for this email
+  const filtered = resets.filter(r => r.email.toLowerCase() !== email.toLowerCase());
+  filtered.push({ email: email.toLowerCase(), code, expiresAt });
+  
+  localStorage.setItem(STORAGE_KEYS.PASSWORD_RESETS, JSON.stringify(filtered));
+  return code;
+};
+
+export const verifyPasswordResetOTP = (email: string, code: string): boolean => {
+  const resetsStr = localStorage.getItem(STORAGE_KEYS.PASSWORD_RESETS);
+  if (!resetsStr) return false;
+  
+  const resets: any[] = JSON.parse(resetsStr);
+  const found = resets.find(r => r.email.toLowerCase() === email.toLowerCase() && r.code === code);
+  if (!found) return false;
+  
+  // Verify expiry
+  if (Date.now() > found.expiresAt) return false;
+  
+  return true;
+};
+
+export const resetUserPassword = async (email: string, newPassword: string): Promise<boolean> => {
+  const users = getUsers();
+  const index = users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
+  if (index === -1) return false;
+
+  const passHash = await sha256(newPassword);
+  users[index].password = passHash;
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+  // Clear consumed reset code
+  const resetsStr = localStorage.getItem(STORAGE_KEYS.PASSWORD_RESETS);
+  if (resetsStr) {
+    const resets: any[] = JSON.parse(resetsStr);
+    const filtered = resets.filter(r => r.email.toLowerCase() !== email.toLowerCase());
+    localStorage.setItem(STORAGE_KEYS.PASSWORD_RESETS, JSON.stringify(filtered));
+  }
+
+  return true;
 };
