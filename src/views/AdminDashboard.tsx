@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users } from 'lucide-react';
-import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers } from '../data/db';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star } from 'lucide-react';
+import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
 
@@ -62,6 +62,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [userSheetUrlInput, setUserSheetUrlInput] = useState(getUserSheetUrl());
   const [showUserScriptModal, setShowUserScriptModal] = useState(false);
   const [registeredUsers, setRegisteredUsers] = useState<any[]>(() => getUsers().filter((u: any) => !u.isAdmin));
+  const [shippingFeeInput, setShippingFeeInput] = useState(getShippingFee().toString());
+  const [shippingThresholdInput, setShippingThresholdInput] = useState(getShippingThreshold().toString());
 
   // Handle local image upload to Base64
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,6 +216,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     setImageUploadBase64('');
     setImageUrl('');
     setFormError('');
+  };
+
+  const handleSaveShippingConfig = () => {
+    const fee = Number(shippingFeeInput);
+    const threshold = Number(shippingThresholdInput);
+    if (isNaN(fee) || fee < 0 || isNaN(threshold) || threshold < 0) {
+      alert("Please enter valid positive numbers for shipping rates.");
+      return;
+    }
+    setShippingFee(fee);
+    setShippingThreshold(threshold);
+    alert("Shipping rates successfully updated!");
+  };
+
+  const handleToggleFeatured = (product: Product) => {
+    const updated = {
+      ...product,
+      isFeatured: !product.isFeatured
+    };
+    saveProduct(updated).then(() => {
+      setProducts(getProducts());
+      onProductsUpdated();
+    });
   };
 
   const handleExportJSON = () => {
@@ -712,8 +737,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                         )}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                           <button
+                            type="button"
+                            onClick={() => handleToggleFeatured(prod)}
+                            style={{ 
+                              color: prod.isFeatured ? '#f59e0b' : 'var(--text-muted)', 
+                              padding: '0.4rem', 
+                              border: '1px solid var(--border)', 
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              background: 'transparent'
+                            }}
+                            title={prod.isFeatured ? "Starred (Featured Bestseller)" : "Star (Feature on Home Page)"}
+                          >
+                            <Star size={14} fill={prod.isFeatured ? "#f59e0b" : "none"} />
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => handleStartEdit(prod)}
                             style={{ color: 'var(--text-main)', padding: '0.4rem', border: '1px solid var(--border)', borderRadius: '4px' }}
                             title="Edit"
@@ -721,6 +764,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                             <Edit2 size={14} />
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDeleteProduct(prod.id)}
                             style={{ color: '#ef4444', padding: '0.4rem', border: '1px solid var(--border)', borderRadius: '4px' }}
                             title="Delete"
@@ -1034,6 +1078,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                 )}
               </div>
             </div>
+
+            {/* ── SECTION 3: Shipping Fees & Offers Configuration ── */}
+            <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '2px solid var(--border)', paddingTop: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <TrendingUp size={18} style={{ color: '#10b981' }} />
+                <span>🚚 Shipping Rates & Offers Configuration</span>
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Configure the shipping fees charged to customers, and define the threshold amount above which shipping is completely free.
+              </p>
+
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 200px' }}>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Default Shipping Fee (₹)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    placeholder="e.g. 50"
+                    value={shippingFeeInput}
+                    onChange={(e) => setShippingFeeInput(e.target.value)}
+                    style={{ fontSize: '0.9rem' }}
+                  />
+                </div>
+                <div style={{ flex: '1 1 200px' }}>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Free Shipping Min Order Threshold (₹)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    placeholder="e.g. 1000"
+                    value={shippingThresholdInput}
+                    onChange={(e) => setShippingThresholdInput(e.target.value)}
+                    style={{ fontSize: '0.9rem' }}
+                  />
+                </div>
+                <button onClick={handleSaveShippingConfig} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content', background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
+                  Save Shipping Rates
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

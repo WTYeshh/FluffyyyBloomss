@@ -21,7 +21,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
   cartItems
 }) => {
   // Grab a few products for the featured/bestseller row
-  const bestsellers = products.slice(0, 4);
+  // Grab starred (featured) products, fallback to first 4 products if none are starred
+  const featuredProducts = products.filter(p => p.isFeatured);
+  const bestsellers = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 4);
 
   const handleNavigateCategory = (cat: 'single' | 'bouquet' | 'keychains' | 'accessories') => {
     setActiveCategory(cat);

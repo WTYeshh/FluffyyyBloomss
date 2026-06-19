@@ -7,6 +7,7 @@ export interface Product {
   originalPrice: number;
   image: string;
   isAvailable: boolean;
+  isFeatured?: boolean;
 }
 
 export interface User {
@@ -136,6 +137,24 @@ export const setUserSheetUrl = (url: string): void => {
   localStorage.setItem(STORAGE_KEYS.USER_SHEET_URL, url);
 };
 
+export const getShippingFee = (): number => {
+  const fee = localStorage.getItem('fluffy_bloom_shipping_fee');
+  return fee !== null ? Number(fee) : 50;
+};
+
+export const setShippingFee = (fee: number): void => {
+  localStorage.setItem('fluffy_bloom_shipping_fee', String(fee));
+};
+
+export const getShippingThreshold = (): number => {
+  const threshold = localStorage.getItem('fluffy_bloom_shipping_threshold');
+  return threshold !== null ? Number(threshold) : 1000;
+};
+
+export const setShippingThreshold = (threshold: number): void => {
+  localStorage.setItem('fluffy_bloom_shipping_threshold', String(threshold));
+};
+
 // Push a user record to the customer data Google Sheet
 const pushUserToSheet = async (user: { id: string; name: string; email: string; registeredAt?: string }) => {
   const url = getUserSheetUrl();
@@ -191,7 +210,8 @@ export const syncProducts = async (): Promise<Product[]> => {
           price: Number(item.price || 0),
           originalPrice: Number(item.originalPrice || 0),
           image: String(item.image || ''),
-          isAvailable: item.isAvailable === true || item.isAvailable === 'true' || item.isAvailable === 1 || item.isAvailable === '1'
+          isAvailable: item.isAvailable === true || item.isAvailable === 'true' || item.isAvailable === 1 || item.isAvailable === '1',
+          isFeatured: item.isFeatured === true || item.isFeatured === 'true' || item.isFeatured === 1 || item.isFeatured === '1'
         };
       });
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(parsedProducts));

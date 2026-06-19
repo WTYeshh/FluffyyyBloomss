@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingBag, ArrowLeft, Plus, Minus, Trash2, CheckCircle, Smartphone, MapPin, Mail, User } from 'lucide-react';
-import { createOrder } from '../data/db';
+import { createOrder, getShippingFee, getShippingThreshold } from '../data/db';
 import type { Product, User as DbUser } from '../data/db';
 import { sendOrderEmail } from '../data/email';
 
@@ -56,8 +56,10 @@ export const CartView: React.FC<CartViewProps> = ({
     }
   }, [currentUser]);
 
+  const shippingFee = getShippingFee();
+  const shippingThreshold = getShippingThreshold();
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const shipping = subtotal > 1000 ? 0 : 50;
+  const shipping = subtotal >= shippingThreshold ? 0 : shippingFee;
   const total = subtotal + shipping;
 
   const isFormValid = 
@@ -294,7 +296,7 @@ export const CartView: React.FC<CartViewProps> = ({
             </div>
             {shipping > 0 && (
               <p style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '-0.25rem', fontWeight: 'bold' }}>
-                Add ₹{1000 - subtotal} more for FREE shipping!
+                Add ₹{shippingThreshold - subtotal} more for FREE shipping!
               </p>
             )}
             <div className="summary-row summary-total">
