@@ -388,7 +388,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
 
       {/* Product Manager */}
       {activeSubTab === 'products' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }}>
+        <div className="admin-grid">
           {/* Form to Add/Edit Product */}
           <div className="admin-content-card" style={{ height: 'fit-content' }}>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -439,7 +439,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div className="form-row">
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label" htmlFor="prod-category">Category</label>
                   <select
@@ -463,7 +463,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div className="form-row">
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label" htmlFor="prod-original-price">Strike Price (₹)</label>
                   <input
@@ -492,7 +492,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
 
               <div className="form-group" style={{ margin: 0 }}>
                 <label className="form-label">Product Image Source</label>
-                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <div className="tab-btn-group">
                   <button
                     type="button"
                     className={`tab-btn ${imageType === 'upload' ? 'active' : ''}`}
@@ -745,7 +745,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
           </div>
 
           {/* Detailed stats grids */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div className="admin-stats-grid">
             {/* Category Split */}
             <div className="admin-content-card">
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.25rem' }}>
@@ -796,7 +796,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
             </div>
 
             {/* Google Sheets Synchronization Settings */}
-            <div className="admin-content-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', gridColumn: 'span 2' }}>
+            <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Link size={18} style={{ color: 'var(--primary)' }} />
                 <span>Google Sheets Database Sync Settings</span>
