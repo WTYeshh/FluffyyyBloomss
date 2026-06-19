@@ -52,7 +52,8 @@ const STORAGE_KEYS = {
   LOGGED_IN_USER: 'fluffy_bloom_logged_in_user',
   GOOGLE_SHEET_URL: 'fluffy_bloom_sheets_url',
   USER_SHEET_URL: 'fluffy_bloom_user_sheets_url',
-  PASSWORD_RESETS: 'fluffy_bloom_password_resets'
+  PASSWORD_RESETS: 'fluffy_bloom_password_resets',
+  ORDERS_SHEET_URL: 'fluffy_bloom_orders_sheets_url'
 };
 
 // Initialize DB if empty
@@ -138,6 +139,18 @@ export const setUserSheetUrl = (url: string): void => {
   localStorage.setItem(STORAGE_KEYS.USER_SHEET_URL, url);
 };
 
+export const getOrdersSheetUrl = (): string => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ORDERS_SHEET_URL);
+  if (saved === null) {
+    return '';
+  }
+  return saved;
+};
+
+export const setOrdersSheetUrl = (url: string): void => {
+  localStorage.setItem(STORAGE_KEYS.ORDERS_SHEET_URL, url);
+};
+
 export const getShippingFee = (): number => {
   const fee = localStorage.getItem('fluffy_bloom_shipping_fee');
   return fee !== null ? Number(fee) : 50;
@@ -188,10 +201,16 @@ export const syncProducts = async (): Promise<Product[]> => {
     if (response.ok) {
       const data = await response.json();
       const parsedProducts: Product[] = data.map((item: any) => {
-        let cat = String(item.category || 'single').toLowerCase().trim();
+        // Normalize keys to lowercase to be safe against case sensitivity in column headers
+        const normalizedItem: any = {};
+        Object.keys(item).forEach(key => {
+          normalizedItem[key.toLowerCase().trim()] = item[key];
+        });
+
+        let cat = String(normalizedItem.category || 'single').toLowerCase().trim();
         // Map old spreadsheet categories to the new ones
         if (cat === 'flowers') {
-          const title = String(item.title || '').toLowerCase();
+          const title = String(normalizedItem.title || '').toLowerCase();
           if (title.includes('bouquet') || title.includes('set') || title.includes('bunch') || title.includes('pack')) {
             cat = 'bouquet';
           } else {
@@ -204,15 +223,15 @@ export const syncProducts = async (): Promise<Product[]> => {
         }
 
         return {
-          id: String(item.id || ''),
-          title: String(item.title || ''),
-          description: String(item.description || ''),
+          id: String(normalizedItem.id || ''),
+          title: String(normalizedItem.title || ''),
+          description: String(normalizedItem.description || ''),
           category: cat as any,
-          price: Number(item.price || 0),
-          originalPrice: Number(item.originalPrice || 0),
-          image: String(item.image || ''),
-          isAvailable: item.isAvailable === true || item.isAvailable === 'true' || item.isAvailable === 1 || item.isAvailable === '1',
-          isFeatured: item.isFeatured === true || item.isFeatured === 'true' || item.isFeatured === 1 || item.isFeatured === '1'
+          price: Number(normalizedItem.price || 0),
+          originalPrice: Number(normalizedItem.originalprice || normalizedItem.originalPrice || 0),
+          image: String(normalizedItem.image || ''),
+          isAvailable: normalizedItem.isavailable === true || normalizedItem.isavailable === 'true' || normalizedItem.isavailable === 1 || normalizedItem.isavailable === '1',
+          isFeatured: normalizedItem.isfeatured === true || normalizedItem.isfeatured === 'true' || normalizedItem.isfeatured === 1 || normalizedItem.isfeatured === '1'
         };
       });
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(parsedProducts));
@@ -385,6 +404,10 @@ export const createOrder = (orderData: Omit<Order, 'id' | 'date' | 'status'>): O
   
   orders.unshift(newOrder); // Add to beginning of array
   localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+
+  // Sync order to sheet
+  pushOrderToSheet(newOrder);
+
   return newOrder;
 };
 
@@ -394,7 +417,91 @@ export const updateOrderStatus = (orderId: string, status: 'Pending' | 'Shipped'
   if (index >= 0) {
     orders[index].status = status;
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+
+    // Update in Google Sheet
+    pushOrderToSheet(orders[index]);
   }
+};
+
+export const pushOrderToSheet = async (order: Order) => {
+  const url = getOrdersSheetUrl();
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'saveOrder',
+        order: {
+          id: order.id,
+          userId: order.userId,
+          userName: order.userName,
+          email: order.email,
+          phone: order.phone,
+          address: order.address,
+          items: order.items,
+          total: order.total,
+          status: order.status,
+          date: order.date,
+          paymentMethod: order.paymentMethod,
+          paymentStatus: order.paymentStatus
+        }
+      })
+    });
+  } catch (e) {
+    console.error('Failed to push order to Google Sheets:', e);
+  }
+};
+
+export const syncOrders = async (): Promise<Order[]> => {
+  const url = getOrdersSheetUrl();
+  if (!url) return getOrders();
+
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const data = await response.json();
+      const parsedOrders: Order[] = data.map((item: any) => {
+        // Normalize keys to lowercase to be safe against case sensitivity in column headers
+        const normalizedItem: any = {};
+        Object.keys(item).forEach(key => {
+          normalizedItem[key.toLowerCase().trim()] = item[key];
+        });
+
+        let parsedItems: any[] = [];
+        if (typeof normalizedItem.items === 'string') {
+          try {
+            parsedItems = JSON.parse(normalizedItem.items);
+          } catch (e) {
+            console.error("Failed to parse items from order sheet row:", e);
+          }
+        } else if (Array.isArray(normalizedItem.items)) {
+          parsedItems = normalizedItem.items;
+        }
+
+        return {
+          id: String(normalizedItem.id || ''),
+          userId: String(normalizedItem.userid || normalizedItem.userId || ''),
+          userName: String(normalizedItem.username || normalizedItem.userName || ''),
+          email: String(normalizedItem.email || ''),
+          phone: String(normalizedItem.phone || ''),
+          address: String(normalizedItem.address || ''),
+          items: parsedItems,
+          total: Number(normalizedItem.total || 0),
+          status: (normalizedItem.status || 'Pending') as 'Pending' | 'Shipped' | 'Delivered',
+          date: String(normalizedItem.date || ''),
+          paymentMethod: (normalizedItem.paymentmethod || normalizedItem.paymentMethod || 'COD') as 'UPI' | 'COD',
+          paymentStatus: (normalizedItem.paymentstatus || normalizedItem.paymentStatus || 'Pending') as 'Pending' | 'Paid' | 'Failed'
+        };
+      });
+
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(parsedOrders));
+      return parsedOrders;
+    }
+  } catch (e) {
+    console.error("Failed to sync orders from Google Sheet:", e);
+  }
+  return getOrders();
 };
 
 export const generatePasswordResetOTP = async (email: string): Promise<string | null> => {

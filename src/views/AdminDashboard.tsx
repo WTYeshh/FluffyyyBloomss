@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock, RefreshCw } from 'lucide-react';
-import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold } from '../data/db';
+import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold, getOrdersSheetUrl, setOrdersSheetUrl, syncOrders } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
 
@@ -45,6 +45,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     setProducts(initialProducts);
   }, [initialProducts]);
 
+  useEffect(() => {
+    syncOrders().then(syncedOrders => {
+      setOrders(syncedOrders);
+    });
+  }, []);
+
   // Form State
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
@@ -61,6 +67,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [userSheetUrlInput, setUserSheetUrlInput] = useState(getUserSheetUrl());
   const [showUserScriptModal, setShowUserScriptModal] = useState(false);
+  const [ordersSheetUrlInput, setOrdersSheetUrlInput] = useState(getOrdersSheetUrl());
+  const [showOrdersScriptModal, setShowOrdersScriptModal] = useState(false);
   const [registeredUsers, setRegisteredUsers] = useState<any[]>(() => getUsers().filter((u: any) => !u.isAdmin).reverse().slice(0, 15));
   const [shippingFeeInput, setShippingFeeInput] = useState(getShippingFee().toString());
   const [shippingThresholdInput, setShippingThresholdInput] = useState(getShippingThreshold().toString());
@@ -174,8 +182,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     setOrders(getOrders());
   };
 
-  const handleRefreshOrders = () => {
-    setOrders(getOrders());
+  const handleRefreshOrders = async () => {
+    const syncedOrders = await syncOrders();
+    setOrders(syncedOrders);
     alert('Dashboard orders and stats successfully refreshed!');
   };
 
@@ -208,6 +217,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       alert('Customer Data Sheet URL saved! New sign-ups will automatically sync to this sheet.');
     } else {
       alert('Customer Data Sheet URL cleared.');
+    }
+  };
+
+  const handleSaveOrdersSheetUrl = async () => {
+    setOrdersSheetUrl(ordersSheetUrlInput);
+    if (ordersSheetUrlInput) {
+      alert("Saving Google Sheets Web App URL! Syncing orders data from spreadsheet...");
+      const synced = await syncOrders();
+      setOrders(synced);
+    } else {
+      alert("Cleared Google Sheets Web App URL. Dashboard will use local orders database.");
+      setOrders(getOrders());
     }
   };
 
@@ -309,7 +330,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
             className={`admin-tab ${activeSubTab === 'orders' ? 'active' : ''}`}
             onClick={() => setActiveSubTab('orders')}
           >
-            Orders Queue ({Math.min(orders.length, 15)})
+            Orders Queue ({orders.length})
           </button>
           <button
             className={`admin-tab ${activeSubTab === 'products' ? 'active' : ''}`}
@@ -1214,6 +1235,71 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
               </div>
             </div>
 
+            {/* ── SECTION 3: Orders Data — Google Sheets Sync ── */}
+            <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '2px solid var(--border)', paddingTop: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={18} style={{ color: '#10b981' }} />
+                <span>📋 Orders Data — Google Sheets Sync</span>
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Link a Google Sheet to record customer orders. Once connected, new orders placed by customers and any status updates (Pending, Shipped, Delivered) in the Admin Dashboard are automatically synced to the spreadsheet. This allows multiple admin devices to share a single, real-time orders queue.
+              </p>
+
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ flexGrow: 1, minWidth: '300px' }}>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Orders Sheet — Web App URL</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder="https://script.google.com/macros/s/.../exec"
+                    value={ordersSheetUrlInput}
+                    onChange={(e) => setOrdersSheetUrlInput(e.target.value)}
+                    style={{ fontSize: '0.9rem' }}
+                  />
+                </div>
+                <button onClick={handleSaveOrdersSheetUrl} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content', background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
+                  Save Orders Sheet
+                </button>
+              </div>
+
+              {/* Detailed setup guide */}
+              <div style={{ padding: '1.25rem', background: 'var(--bg-store)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.85rem', lineHeight: '1.75' }}>
+                <strong style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-main)', fontSize: '0.95rem' }}>📋 Step-by-Step Setup Guide (Orders Sheet):</strong>
+                <ol style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Create a new (separate) Google Sheet.</strong>{' '}
+                    Name it <code style={{ background: 'var(--border)', padding: '1px 6px', borderRadius: '4px' }}>FluffyyyBloomss Orders</code>.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Add these exact headers in Row 1 (A→K):</strong>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                      {['id','userId','userName','email','phone','address','items','total','status','date','paymentMethod','paymentStatus'].map(h => (
+                        <code key={h} style={{ background: 'var(--border)', padding: '2px 7px', borderRadius: '4px', color: 'var(--text-main)', fontWeight: 'bold' }}>{h}</code>
+                      ))}
+                    </div>
+                    <span style={{ display: 'block', marginTop: '4px', fontSize: '0.8rem' }}>⚠️ Spelling must be exact. The `items` column will store a stringified list of products purchased.</span>
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Open Apps Script and paste the Orders Sheet code.</strong>{' '}
+                    Click <strong>Extensions → Apps Script</strong>, delete existing code, paste the script template, and save.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Deploy as a Web App</strong> (Execute as Me, Anyone can access). Copy the Web App URL.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Paste the URL above and click Save Orders Sheet.</strong>{' '}
+                    This links your real-time queue.
+                  </li>
+                </ol>
+                <button
+                  onClick={() => setShowOrdersScriptModal(true)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginTop: '1rem', fontWeight: 'bold', color: '#10b981', textDecoration: 'underline', cursor: 'pointer' }}
+                >
+                  📄 Click here to view &amp; copy the Orders Sheet Apps Script Code
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
@@ -1426,6 +1512,112 @@ function doGet(e) {
 }`}
               </pre>
               <button className="btn-primary mt-4" style={{ background: '#8b5cf6' }} onClick={() => setShowUserScriptModal(false)}>
+                Got It, Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Orders Sheet Apps Script Modal */}
+      {showOrdersScriptModal && (
+        <div className="modal-overlay" onClick={() => setShowOrdersScriptModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '650px' }} onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowOrdersScriptModal(false)}>
+              <X size={18} />
+            </button>
+            <div className="modal-body">
+              <h2 className="modal-title">Orders Sheet — Apps Script Code</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                Copy this code into the Apps Script editor of your <strong>FluffyyyBloomss Orders</strong> Google Sheet and deploy it as a Web App:
+              </p>
+              <pre
+                style={{
+                  background: 'var(--bg-store)',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  overflow: 'auto',
+                  maxHeight: '350px',
+                  fontSize: '0.75rem',
+                  fontFamily: 'monospace',
+                  textAlign: 'left',
+                  border: '1px solid var(--border)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all'
+                }}
+              >
+{`function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var payload = JSON.parse(e.postData.contents);
+  var action = payload.action;
+
+  if (action === 'saveOrder') {
+    var order = payload.order;
+    var data = sheet.getDataRange().getValues();
+    var foundRow = -1;
+
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(order.id)) {
+        foundRow = i + 1;
+        break;
+      }
+    }
+
+    var rowValues = [
+      order.id,
+      order.userId,
+      order.userName,
+      order.email,
+      order.phone,
+      order.address,
+      typeof order.items === 'string' ? order.items : JSON.stringify(order.items),
+      order.total,
+      order.status,
+      order.date,
+      order.paymentMethod,
+      order.paymentStatus
+    ];
+
+    if (foundRow !== -1) {
+      sheet.getRange(foundRow, 1, 1, rowValues.length).setValues([rowValues]);
+    } else {
+      sheet.appendRow(rowValues);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var rows = [];
+  for (var i = 1; i < data.length; i++) {
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) {
+      var headerName = headers[j];
+      var val = data[i][j];
+      if (headerName === 'items' && typeof val === 'string') {
+        try {
+          obj[headerName] = JSON.parse(val);
+        } catch (err) {
+          obj[headerName] = val;
+        }
+      } else {
+        obj[headerName] = val;
+      }
+    }
+    rows.push(obj);
+  }
+  // Reverse the array to show newest orders first
+  rows.reverse();
+  return ContentService.createTextOutput(JSON.stringify(rows))
+    .setMimeType(ContentService.MimeType.JSON);
+}`}
+              </pre>
+              <button className="btn-primary mt-4" style={{ background: '#10b981' }} onClick={() => setShowOrdersScriptModal(false)}>
                 Got It, Close
               </button>
             </div>
