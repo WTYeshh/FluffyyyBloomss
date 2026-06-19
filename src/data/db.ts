@@ -47,7 +47,8 @@ const STORAGE_KEYS = {
   ORDERS: 'fluffy_bloom_orders',
   USERS: 'fluffy_bloom_users',
   LOGGED_IN_USER: 'fluffy_bloom_logged_in_user',
-  GOOGLE_SHEET_URL: 'fluffy_bloom_sheets_url'
+  GOOGLE_SHEET_URL: 'fluffy_bloom_sheets_url',
+  USER_SHEET_URL: 'fluffy_bloom_user_sheets_url'
 };
 
 // Initialize DB if empty
@@ -112,6 +113,37 @@ export const getGoogleSheetUrl = (): string => {
 
 export const setGoogleSheetUrl = (url: string): void => {
   localStorage.setItem(STORAGE_KEYS.GOOGLE_SHEET_URL, url);
+};
+
+export const getUserSheetUrl = (): string => {
+  return localStorage.getItem(STORAGE_KEYS.USER_SHEET_URL) || '';
+};
+
+export const setUserSheetUrl = (url: string): void => {
+  localStorage.setItem(STORAGE_KEYS.USER_SHEET_URL, url);
+};
+
+// Push a user record to the customer data Google Sheet
+const pushUserToSheet = async (user: { id: string; name: string; email: string; registeredAt?: string }) => {
+  const url = getUserSheetUrl();
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'saveUser',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          registeredAt: user.registeredAt || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+        }
+      })
+    });
+  } catch (e) {
+    console.error('Failed to push user to Google Sheets:', e);
+  }
 };
 
 export const syncProducts = async (): Promise<Product[]> => {
@@ -261,17 +293,22 @@ export const registerUser = async (name: string, email: string, password: string
   if (exists) return null;
   
   const passHash = await sha256(password);
+  const registeredAt = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   const newUser = {
     id: 'user-' + Date.now(),
     name,
     email,
     password: passHash,
-    isAdmin: false
+    isAdmin: false,
+    registeredAt
   };
   
   users.push(newUser);
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
   
+  // Push to Customer Data Google Sheet if connected
+  pushUserToSheet({ id: newUser.id, name: newUser.name, email: newUser.email, registeredAt });
+
   const loggedIn = { id: newUser.id, name: newUser.name, email: newUser.email, isAdmin: newUser.isAdmin };
   localStorage.setItem(STORAGE_KEYS.LOGGED_IN_USER, JSON.stringify(loggedIn));
   return loggedIn;

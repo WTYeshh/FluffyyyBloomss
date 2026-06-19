@@ -1,8 +1,8 @@
 [
   {
     "id": "flower-1",
-    "title": "Blushing Pink Tulip Crochet",
-    "description": "Beautifully hand-stitched pink tulip crochet, perfect for home decor or gifting. Created with premium cotton yarn.",
+    "title": "Blushing Pink Tulip",
+    "description": "Beautifully hand-stitched pink tulip, perfect for home decor or gifting. Created with premium cotton yarn.",
     "category": "single",
     "price": 399,
     "originalPrice": 699,
@@ -11,7 +11,7 @@
   },
   {
     "id": "flower-2",
-    "title": "Sunny Yellow Daisy Crochet",
+    "title": "Sunny Yellow Daisy",
     "description": "Cheerful hand-knit yellow daisy with flexible stem. Bring a touch of warm sunshine indoors all year round.",
     "category": "single",
     "price": 299,
@@ -22,7 +22,7 @@
   {
     "id": "flower-3",
     "title": "Enchanted Rose Handcrafted",
-    "description": "An elegant red rose crocheted by hand. Packaged beautifully to represent eternal love and craftsmanship.",
+    "description": "An elegant red rose handcrafted with love. Packaged beautifully to represent eternal love and artisanship.",
     "category": "single",
     "price": 499,
     "originalPrice": 999,
@@ -32,7 +32,7 @@
   {
     "id": "flower-4",
     "title": "Lavish Lavender Bouquet",
-    "description": "A calming bouquet of hand-crocheted lavender stems wrapped in artisan paper. Feels soft and looks stunning.",
+    "description": "A calming bouquet of handmade lavender stems wrapped in artisan paper. Feels soft and looks stunning.",
     "category": "bouquet",
     "price": 799,
     "originalPrice": 1299,
@@ -41,8 +41,8 @@
   },
   {
     "id": "flower-5",
-    "title": "Elegant Lilac Blossom Crochet",
-    "description": "Soft lilac crochet flower bunch with green leaves. Handwoven with fine thread for intricate, realistic detail.",
+    "title": "Elegant Lilac Blossom",
+    "description": "Soft lilac flower bunch with green leaves. Handwoven with fine yarn for intricate, realistic detail.",
     "category": "single",
     "price": 499,
     "originalPrice": 899,
@@ -62,7 +62,7 @@
   {
     "id": "flower-7",
     "title": "Ocean Blue Forget-Me-Not Bouquet",
-    "description": "A lovely bundle of tiny forget-me-not blossoms crocheted in shades of sky blue. Comes with a decorative bow.",
+    "description": "A lovely bundle of tiny forget-me-not blossoms handwoven in shades of sky blue. Comes with a decorative bow.",
     "category": "bouquet",
     "price": 449,
     "originalPrice": 799,
@@ -72,7 +72,7 @@
   {
     "id": "flower-8",
     "title": "Sunny Meadow Sunflower Set",
-    "description": "A premium pair of large crocheted sunflowers with custom wood stands. Adds instant warmth and hand-crafted joy.",
+    "description": "A premium pair of large handmade sunflowers with custom wood stands. Adds instant warmth and hand-crafted joy.",
     "category": "bouquet",
     "price": 899,
     "originalPrice": 1499,
@@ -81,7 +81,7 @@
   },
   {
     "id": "keychain-1",
-    "title": "Chubby Kitty Crochet Keychain",
+    "title": "Chubby Kitty Amigurumi Keychain",
     "description": "Super soft, stuffed little kitty keychain with a gold ring clasp. Made from milk cotton yarn.",
     "category": "keychains",
     "price": 199,
@@ -91,7 +91,7 @@
   },
   {
     "id": "keychain-2",
-    "title": "Cute Octopus Crochet Keychain",
+    "title": "Cute Octopus Amigurumi Keychain",
     "description": "Adorable pastel-colored octopus keychain with 8 tiny curly tentacles. Includes key ring and chain.",
     "category": "keychains",
     "price": 179,
@@ -101,7 +101,7 @@
   },
   {
     "id": "keychain-3",
-    "title": "Mini Dinosaur Crochet Keychain",
+    "title": "Mini Dinosaur Amigurumi Keychain",
     "description": "A sweet little green T-Rex keychain handwoven with love. Safe metal keyring attached.",
     "category": "keychains",
     "price": 249,
@@ -111,7 +111,7 @@
   },
   {
     "id": "keychain-4",
-    "title": "Kawaii Frog Crochet Keychain",
+    "title": "Kawaii Frog Amigurumi Keychain",
     "description": "Chubby round frog keychain with rosy cheeks. The perfect accessory for backpacks, handbags, or keys.",
     "category": "keychains",
     "price": 199,
@@ -131,7 +131,7 @@
   },
   {
     "id": "keychain-6",
-    "title": "Spooky Ghost Crochet Keychain",
+    "title": "Spooky Ghost Amigurumi Keychain",
     "description": "A tiny, friendly ghost keychain that glows under blacklight. Soft, squishy, and not spooky at all!",
     "category": "keychains",
     "price": 149,
@@ -151,7 +151,7 @@
   },
   {
     "id": "keychain-8",
-    "title": "Happy Bee Crochet Keychain",
+    "title": "Happy Bee Amigurumi Keychain",
     "description": "Buzzy bumblebee keychain with tiny white wings and stripes. Guaranteed to bring a smile to your face.",
     "category": "keychains",
     "price": 199,

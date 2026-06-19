@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X } from 'lucide-react';
-import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts } from '../data/db';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users } from 'lucide-react';
+import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
 
@@ -59,6 +59,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [formError, setFormError] = useState('');
   const [sheetUrlInput, setSheetUrlInput] = useState(getGoogleSheetUrl());
   const [showScriptModal, setShowScriptModal] = useState(false);
+  const [userSheetUrlInput, setUserSheetUrlInput] = useState(getUserSheetUrl());
+  const [showUserScriptModal, setShowUserScriptModal] = useState(false);
+  const [registeredUsers, setRegisteredUsers] = useState<any[]>(() => getUsers().filter((u: any) => !u.isAdmin));
 
   // Handle local image upload to Base64
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,6 +191,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       alert("Cleared Google Sheets Web App URL. Storefront will use local catalog database.");
       setProducts(getProducts());
       onProductsUpdated();
+    }
+  };
+
+  const handleSaveUserSheetUrl = () => {
+    setUserSheetUrl(userSheetUrlInput);
+    if (userSheetUrlInput) {
+      alert('Customer Data Sheet URL saved! New sign-ups will automatically sync to this sheet.');
+    } else {
+      alert('Customer Data Sheet URL cleared.');
     }
   };
 
@@ -420,7 +432,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                   id="prod-title"
                   type="text"
                   className="form-input"
-                  placeholder="e.g. Lavender Crochet Bouquet"
+                  placeholder="e.g. Lavender Flower Bouquet"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -816,19 +828,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
               </div>
             </div>
 
-            {/* Google Sheets Synchronization Settings */}
+            {/* ── SECTION 1: Product Inventory Sheet ── */}
             <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Link size={18} style={{ color: 'var(--primary)' }} />
-                <span>Google Sheets Database Sync Settings</span>
+                <span>📦 Product Inventory — Google Sheets Sync</span>
               </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                Connect your storefront catalog to a Google Sheet. Once connected, your friend can add or edit products directly from their phone's Google Sheets app, and updates will automatically sync to customers!
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                Link a Google Sheet to your product catalog. Once connected, every product you add, edit, or delete in the Admin Dashboard is
+                automatically saved to the Sheet — and you can also edit products directly in the Sheet and sync them back here.
+                <strong style={{ color: 'var(--text-main)' }}> This prevents any data loss</strong> — the Sheet acts as a permanent backup of your store.
               </p>
-              
-              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
                 <div style={{ flexGrow: 1, minWidth: '300px' }}>
-                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Google Web App URL</label>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Product Sheet — Web App URL</label>
                   <input
                     type="url"
                     className="form-input"
@@ -838,40 +852,175 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                     style={{ fontSize: '0.9rem' }}
                   />
                 </div>
-                <button
-                  onClick={handleSaveSheetUrl}
-                  className="btn-primary"
-                  style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content' }}
-                >
+                <button onClick={handleSaveSheetUrl} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content' }}>
                   Save Connection
                 </button>
               </div>
 
-              {/* Step by step Help instructions */}
-              <div style={{ padding: '1.25rem', background: 'var(--bg-store)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.85rem', lineHeight: '1.6' }}>
-                <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-main)' }}>📋 Step-by-Step Google Sheets Setup Guide:</strong>
-                <ol style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                  <li>Create a new Google Sheet named <code>FluffyyyBloomss Inventory</code>.</li>
-                  <li>In the first row, set the exact column headers: <br/>
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)' }}>id</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>title</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>description</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>category</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>price</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>originalPrice</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>image</code>, 
-                    <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-main)', marginLeft: '4px' }}>isAvailable</code>
+              {/* Detailed setup guide */}
+              <div style={{ padding: '1.25rem', background: 'var(--bg-store)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.85rem', lineHeight: '1.75' }}>
+                <strong style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-main)', fontSize: '0.95rem' }}>📋 Step-by-Step Setup Guide (Product Sheet):</strong>
+                <ol style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Create a new Google Sheet.</strong>{' '}
+                    Go to <a href="https://sheets.google.com" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>sheets.google.com</a>, click
+                    <strong> + Blank</strong>. Name it <code style={{ background: 'var(--border)', padding: '1px 6px', borderRadius: '4px' }}>FluffyyyBloomss Inventory</code>.
                   </li>
-                  <li>Click <strong>Extensions &gt; Apps Script</strong>. Delete any code, and paste our Apps Script integration code.</li>
-                  <li>Click <strong>Deploy &gt; New Deployment</strong>. Select <strong>Web App</strong>. Set "Execute as" to <strong>Me</strong> and "Who has access" to <strong>Anyone</strong>.</li>
-                  <li>Click <strong>Deploy</strong>, authorize permissions, copy the <strong>Web App URL</strong>, and paste it in the settings box above!</li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Add the exact column headers in Row 1.</strong>{' '}
+                    Click cell A1 and type each header exactly as shown, one per column (A→H):
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                      {['id','title','description','category','price','originalPrice','image','isAvailable'].map(h => (
+                        <code key={h} style={{ background: 'var(--border)', padding: '2px 7px', borderRadius: '4px', color: 'var(--text-main)', fontWeight: 'bold' }}>{h}</code>
+                      ))}
+                    </div>
+                    <span style={{ display: 'block', marginTop: '4px', fontSize: '0.8rem' }}>⚠️ Spelling must be exact — lowercase, no spaces. The app reads these column names directly.</span>
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Open the Apps Script editor.</strong>{' '}
+                    In your Google Sheet, click the top menu: <strong>Extensions → Apps Script</strong>. A new tab opens with a code editor.
+                    Delete all existing code in the editor completely.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Paste the integration code.</strong>{' '}
+                    Click the button below to see the code, copy it fully, and paste it into the Apps Script editor.
+                    Then click the 💾 <strong>Save</strong> icon (or Ctrl+S).
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Deploy as a Web App.</strong>{' '}
+                    Click <strong>Deploy → New Deployment</strong>. In the dialog:
+                    <ul style={{ paddingLeft: '1.25rem', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <li>Click the gear ⚙️ icon next to "Select type" → choose <strong>Web App</strong></li>
+                      <li>Description: <code style={{ background: 'var(--border)', padding: '1px 5px', borderRadius: '4px' }}>FluffyyyBloomss Inventory</code></li>
+                      <li>"Execute as": set to <strong>Me (your Google account)</strong></li>
+                      <li>"Who has access": set to <strong>Anyone</strong></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Authorize and copy the URL.</strong>{' '}
+                    Click <strong>Deploy</strong>. Google will ask to authorize — click <strong>Authorize access</strong> and sign in.
+                    After authorization, a popup shows your <strong>Web App URL</strong> (starts with <code>https://script.google.com/macros/s/...</code>).
+                    Copy that URL.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Paste the URL above and click Save Connection.</strong>{' '}
+                    Your product catalog is now permanently backed up. Every time you add or edit a product here, it syncs to the Sheet automatically.
+                  </li>
                 </ol>
-                <button 
-                  onClick={() => setShowScriptModal(true)} 
-                  style={{ display: 'block', marginTop: '1rem', fontWeight: 'bold', color: 'var(--primary)', textDecoration: 'underline', cursor: 'pointer' }}
+                <button
+                  onClick={() => setShowScriptModal(true)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginTop: '1rem', fontWeight: 'bold', color: 'var(--primary)', textDecoration: 'underline', cursor: 'pointer' }}
                 >
-                  Click here to view Google Apps Script Code to copy
+                  📄 Click here to view &amp; copy the Product Sheet Apps Script Code
                 </button>
+              </div>
+            </div>
+
+            {/* ── SECTION 2: Customer Data Sheet ── */}
+            <div className="admin-content-card admin-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '2px solid var(--border)', paddingTop: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Users size={18} style={{ color: '#8b5cf6' }} />
+                <span>👥 Customer Data — Google Sheets Sync</span>
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                A <strong style={{ color: 'var(--text-main)' }}>separate Sheet</strong> that automatically records every customer who signs up on your store — name, email, and registration date.
+                You can use this sheet to send bulk emails, promotional campaigns, or follow-up messages directly from Google Sheets.
+              </p>
+
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ flexGrow: 1, minWidth: '300px' }}>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Customer Sheet — Web App URL</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder="https://script.google.com/macros/s/.../exec"
+                    value={userSheetUrlInput}
+                    onChange={(e) => setUserSheetUrlInput(e.target.value)}
+                    style={{ fontSize: '0.9rem' }}
+                  />
+                </div>
+                <button onClick={handleSaveUserSheetUrl} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1.5rem', height: 'fit-content', background: '#8b5cf6', boxShadow: '0 4px 12px rgba(139,92,246,0.25)' }}>
+                  Save Customer Sheet
+                </button>
+              </div>
+
+              {/* Detailed setup guide */}
+              <div style={{ padding: '1.25rem', background: 'var(--bg-store)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.85rem', lineHeight: '1.75' }}>
+                <strong style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-main)', fontSize: '0.95rem' }}>📋 Step-by-Step Setup Guide (Customer Sheet):</strong>
+                <ol style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Create a new (separate) Google Sheet.</strong>{' '}
+                    Do NOT use the same sheet as Products. Go to sheets.google.com → <strong>+ Blank</strong>.
+                    Name it <code style={{ background: 'var(--border)', padding: '1px 6px', borderRadius: '4px' }}>FluffyyyBloomss Customers</code>.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Add these exact headers in Row 1 (A→D):</strong>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                      {['id','name','email','registeredAt'].map(h => (
+                        <code key={h} style={{ background: 'var(--border)', padding: '2px 7px', borderRadius: '4px', color: 'var(--text-main)', fontWeight: 'bold' }}>{h}</code>
+                      ))}
+                    </div>
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Open Apps Script and paste the Customer Sheet code.</strong>{' '}
+                    Click <strong>Extensions → Apps Script</strong>, delete existing code, paste the customer script, and save.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Deploy as a Web App</strong> (same steps as the Product Sheet — Execute as Me, Anyone can access).
+                    Copy the Web App URL.
+                  </li>
+                  <li>
+                    <strong style={{ color: 'var(--text-main)' }}>Paste the URL above and click Save Customer Sheet.</strong>{' '}
+                    From now on, every new customer who signs up on your store will be automatically added to this Sheet — ready for email campaigns!
+                  </li>
+                </ol>
+                <button
+                  onClick={() => setShowUserScriptModal(true)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginTop: '1rem', fontWeight: 'bold', color: '#8b5cf6', textDecoration: 'underline', cursor: 'pointer' }}
+                >
+                  📄 Click here to view &amp; copy the Customer Sheet Apps Script Code
+                </button>
+              </div>
+
+              {/* Live registered user table */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800 }}>Registered Customers ({registeredUsers.length})</h4>
+                  <button
+                    onClick={() => setRegisteredUsers(getUsers().filter((u: any) => !u.isAdmin))}
+                    className="tab-btn"
+                    style={{ margin: 0, fontSize: '0.8rem', padding: '0.4rem 0.9rem' }}
+                  >
+                    Refresh
+                  </button>
+                </div>
+                {registeredUsers.length > 0 ? (
+                  <div className="table-wrapper">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Registered</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {registeredUsers.map((u: any) => (
+                          <tr key={u.id}>
+                            <td style={{ fontWeight: 600 }}>{u.name}</td>
+                            <td style={{ color: 'var(--primary)', fontSize: '0.88rem' }}>{u.email}</td>
+                            <td style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{u.registeredAt || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-store)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <Users size={32} style={{ marginBottom: '0.5rem', opacity: 0.4 }} />
+                    <p style={{ fontSize: '0.9rem' }}>No customers have signed up yet. Once they do, they'll appear here.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -978,6 +1127,92 @@ function doPost(e) {
 }`}
               </pre>
               <button className="btn-primary mt-4" onClick={() => setShowScriptModal(false)}>
+                Got It, Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Customer Data Sheet Apps Script Modal */}
+      {showUserScriptModal && (
+        <div className="modal-overlay" onClick={() => setShowUserScriptModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '650px' }} onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowUserScriptModal(false)}>
+              <X size={18} />
+            </button>
+            <div className="modal-body">
+              <h2 className="modal-title">Customer Sheet — Apps Script Code</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                Copy this code into the Apps Script editor of your <strong>FluffyyyBloomss Customers</strong> Google Sheet and deploy it as a Web App:
+              </p>
+              <pre
+                style={{
+                  background: 'var(--bg-store)',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  overflow: 'auto',
+                  maxHeight: '350px',
+                  fontSize: '0.75rem',
+                  fontFamily: 'monospace',
+                  textAlign: 'left',
+                  border: '1px solid var(--border)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all'
+                }}
+              >
+{`function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var payload = JSON.parse(e.postData.contents);
+  var action = payload.action;
+
+  if (action === 'saveUser') {
+    var user = payload.user;
+    var data = sheet.getDataRange().getValues();
+    var foundRow = -1;
+
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === String(user.id)) {
+        foundRow = i + 1;
+        break;
+      }
+    }
+
+    var rowValues = [
+      user.id,
+      user.name,
+      user.email,
+      user.registeredAt
+    ];
+
+    if (foundRow !== -1) {
+      sheet.getRange(foundRow, 1, 1, rowValues.length).setValues([rowValues]);
+    } else {
+      sheet.appendRow(rowValues);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var rows = [];
+  for (var i = 1; i < data.length; i++) {
+    var obj = {};
+    for (var j = 0; j < headers.length; j++) {
+      obj[headers[j]] = data[i][j];
+    }
+    rows.push(obj);
+  }
+  return ContentService.createTextOutput(JSON.stringify(rows))
+    .setMimeType(ContentService.MimeType.JSON);
+}`}
+              </pre>
+              <button className="btn-primary mt-4" style={{ background: '#8b5cf6' }} onClick={() => setShowUserScriptModal(false)}>
                 Got It, Close
               </button>
             </div>

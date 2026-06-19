@@ -168,7 +168,7 @@ export const CartView: React.FC<CartViewProps> = ({
         <ShoppingBag size={64} style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }} />
         <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>Your Cart is Empty</h2>
         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', lineHeight: '1.6' }}>
-          Looks like you haven't added any of our cute keychains, hand-crocheted flowers, or One Piece art yet!
+          Looks like you haven't added any of our cute keychains, handmade flowers, or One Piece art yet!
         </p>
         <button 
           className="btn-primary" 

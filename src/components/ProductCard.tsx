@@ -53,28 +53,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
         </div>
 
         {cartQuantity > 0 ? (
-          <div style={{ display: 'flex', gap: '0.4rem', width: '100%', marginTop: '0.75rem' }}>
-            <button
-              className="add-cart-btn active"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddToCart(product, e);
-              }}
+          <div style={{ display: 'flex', gap: '0.4rem', width: '100%', marginTop: '0.75rem' }} onClick={(e) => e.stopPropagation()}>
+            {/* Non-clickable gray status label */}
+            <div
               style={{
-                margin: 0,
                 flexGrow: 1,
-                backgroundColor: 'var(--primary)',
-                color: 'white',
-                borderColor: 'var(--primary)',
+                padding: '0.8rem',
+                backgroundColor: 'rgba(0,0,0,0.06)',
+                border: '1px solid rgba(0,0,0,0.08)',
+                borderRadius: 'var(--radius-sm)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.4rem'
+                gap: '0.4rem',
+                color: 'var(--text-muted)',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                userSelect: 'none',
+                cursor: 'default'
               }}
-              disabled={!product.isAvailable}
             >
-              <span>Item Added ({cartQuantity})</span>
-            </button>
+              <span>✓ Added to Cart ({cartQuantity})</span>
+            </div>
+            {/* +1 button — only interactive element */}
             <button
               className="add-cart-btn"
               onClick={(e) => {
@@ -90,6 +91,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
                 justifyContent: 'center',
                 alignItems: 'center',
                 fontWeight: 'bold',
+                fontSize: '1rem',
                 backgroundColor: 'var(--bg-store)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-sm)'
@@ -97,7 +99,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
               disabled={!product.isAvailable}
               title="Add one more"
             >
-              <span>+1</span>
+              +1
             </button>
           </div>
         ) : (

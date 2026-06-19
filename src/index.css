@@ -1104,7 +1104,9 @@ button {
 .drawer-link:hover, .drawer-link.active {
   color: var(--text-main);
   border-bottom-color: var(--primary);
-}/* Responsive Navbar & Admin overrides */
+}
+
+/* ─── Responsive: Tablet (≤ 992px) ─── */
 @media (max-width: 992px) {
   .admin-header {
     flex-direction: column;
@@ -1122,63 +1124,174 @@ button {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+  .cart-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
 }
 
+/* ─── Responsive: Mobile (≤ 768px) ─── */
 @media (max-width: 768px) {
+  /* Navbar */
   .nav-links {
-    display: none; /* Hide standard nav links on mobile */
+    display: none;
   }
-  
   .user-profile-btn {
     padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
   }
-
   .hide-on-mobile {
     display: none;
   }
-  
   .mobile-menu-toggle {
-    display: flex; /* Show menu toggle button on mobile */
+    display: flex;
     color: var(--text-main);
     align-items: center;
     justify-content: center;
   }
-  
   .header-nav {
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
   }
 
-  .product-card {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  /* Hero section */
+  .hero {
+    padding: 2.5rem 1.25rem 2rem;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    letter-spacing: -0.5px;
   }
 
+  /* Product grid */
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  /* Admin */
   .admin-stats-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-
   .admin-span-2 {
     grid-column: span 1 !important;
   }
-
   .form-row {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
   .admin-layout {
     margin: 1.5rem auto 4rem;
     padding: 0 1rem;
     gap: 1.5rem;
   }
-  
   .admin-content-card {
     padding: 1.25rem;
   }
+
+  /* Product card */
+  .product-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Cart items */
+  .cart-item {
+    grid-template-columns: 65px 1fr;
+    gap: 0.75rem;
+  }
+  .cart-qty-ctrl {
+    grid-column: span 2;
+    justify-self: start;
+  }
+  .cart-container {
+    padding: 0 1rem;
+    margin: 1.5rem auto;
+  }
+  .cart-summary-panel {
+    padding: 1.5rem;
+  }
+
+  /* Detail modal */
+  .detail-modal-content {
+    grid-template-columns: 1fr;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  .detail-info-side {
+    padding: 1.5rem;
+  }
+
+  /* Admin table */
+  .admin-table th, .admin-table td {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.82rem;
+  }
 }
 
-/* Footer Developer Credit - Hover Reveal */
+/* ─── Responsive: Small Phone (≤ 480px) ─── */
+@media (max-width: 480px) {
+  /* Hero */
+  .hero h1 {
+    font-size: 1.65rem;
+    letter-spacing: -0.25px;
+  }
+  .hero p {
+    font-size: 0.95rem;
+  }
+
+  /* Product grid: 2 columns always on small phones */
+  .product-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  /* Category tabs scrollable */
+  .category-tabs {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+    margin: 1rem 0.75rem;
+  }
+  .tab-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Storefront section padding */
+  .product-grid {
+    margin-bottom: 3rem;
+  }
+
+  /* Admin content card on small phones */
+  .admin-content-card {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  /* Footer stack */
+  .footer-bottom-row {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  /* Modal padding */
+  .modal-body {
+    padding: 1.5rem;
+  }
+  .modal-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* ─── Footer Developer Credit — Hover Reveal ─── */
 .footer-bottom-row {
   display: flex;
   align-items: center;
@@ -1231,12 +1344,4 @@ button {
   opacity: 1 !important;
   text-decoration: underline;
   color: var(--primary);
-}
-
-/* On mobile: stack copyright and credit on separate lines */
-@media (max-width: 480px) {
-  .footer-bottom-row {
-    flex-direction: column;
-    gap: 0.3rem;
-  }
 }

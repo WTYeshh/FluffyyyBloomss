@@ -79,7 +79,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             zIndex: 1
           }}
         >
-          Discover Cozy Crochet Florals & Unique Anime Art
+          Discover Handmade Florals, Amigurumi & Unique Anime Art
         </h1>
 
         <p 
