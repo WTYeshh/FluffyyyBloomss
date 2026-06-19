@@ -17,6 +17,7 @@ interface CartViewProps {
   currentUser: DbUser | null;
   setView: (view: string) => void;
   onOpenAuth: () => void;
+  onOrderConfirmed: (name: string) => void;
 }
 
 export const CartView: React.FC<CartViewProps> = ({
@@ -26,7 +27,8 @@ export const CartView: React.FC<CartViewProps> = ({
   onClearCart,
   currentUser,
   setView,
-  onOpenAuth
+  onOpenAuth,
+  onOrderConfirmed
 }) => {
   // Checkout form fields
   const [phone, setPhone] = useState('');
@@ -37,12 +39,13 @@ export const CartView: React.FC<CartViewProps> = ({
   const [pincode, setPincode] = useState('');
   const [formError, setFormError] = useState('');
   const [successOrder, setSuccessOrder] = useState<any | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('COD');
 
   // Sync email & name when currentUser changes
   React.useEffect(() => {
     if (currentUser) {
-      if (!fullName) setFullName(currentUser.name);
-      if (!email) setEmail(currentUser.email);
+      setFullName(currentUser.name);
+      setEmail(currentUser.email);
     }
   }, [currentUser]);
 
@@ -102,7 +105,9 @@ export const CartView: React.FC<CartViewProps> = ({
       phone: phone,
       address: fullAddressString,
       items: orderItems,
-      total: total
+      total: total,
+      paymentMethod: paymentMethod,
+      paymentStatus: paymentMethod === 'UPI' ? 'Paid' : 'Pending'
     });
 
     // Send order confirmation details to FluffyyyBloomss@gmail.com
@@ -110,6 +115,7 @@ export const CartView: React.FC<CartViewProps> = ({
 
     setSuccessOrder(order);
     onClearCart();
+    onOrderConfirmed(fullName);
   };
 
   // If order was successfully completed
@@ -150,7 +156,7 @@ export const CartView: React.FC<CartViewProps> = ({
             <strong>Address:</strong> {successOrder.address}
           </p>
           <p style={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'var(--primary)', marginTop: '1rem' }}>
-            Total Payment: ₹{successOrder.total} (Cash on Delivery)
+            Total Payment: ₹{successOrder.total} ({successOrder.paymentMethod === 'UPI' ? 'Paid via UPI Online' : 'Cash on Delivery'})
           </p>
         </div>
 
@@ -402,6 +408,123 @@ export const CartView: React.FC<CartViewProps> = ({
                 </div>
               </div>
 
+              {/* Payment Method Selection */}
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label">Payment Method</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.25rem' }}>
+                  <label 
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      padding: '0.75rem',
+                      borderRadius: 'var(--radius-sm)',
+                      border: `2px solid ${paymentMethod === 'COD' ? 'var(--primary)' : 'var(--border)'}`,
+                      background: paymentMethod === 'COD' ? 'var(--primary-light)' : 'var(--bg-card)',
+                      cursor: 'pointer',
+                      transition: 'var(--transition)',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <input 
+                      type="radio" 
+                      name="paymentMethod" 
+                      checked={paymentMethod === 'COD'} 
+                      onChange={() => setPaymentMethod('COD')} 
+                      style={{ display: 'none' }}
+                    />
+                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Cash on Delivery</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Pay when delivered</span>
+                  </label>
+                  
+                  <label 
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      padding: '0.75rem',
+                      borderRadius: 'var(--radius-sm)',
+                      border: `2px solid ${paymentMethod === 'UPI' ? 'var(--primary)' : 'var(--border)'}`,
+                      background: paymentMethod === 'UPI' ? 'var(--primary-light)' : 'var(--bg-card)',
+                      cursor: 'pointer',
+                      transition: 'var(--transition)',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <input 
+                      type="radio" 
+                      name="paymentMethod" 
+                      checked={paymentMethod === 'UPI'} 
+                      onChange={() => setPaymentMethod('UPI')} 
+                      style={{ display: 'none' }}
+                    />
+                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>UPI Online Pay</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>GPAY, PhonePe, Paytm</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* UPI Details Display */}
+              {paymentMethod === 'UPI' && (
+                <div 
+                  style={{
+                    background: 'var(--bg-store)',
+                    border: '1px dashed var(--primary)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '1.25rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    marginTop: '0.5rem',
+                    boxShadow: 'var(--shadow-sm)',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '0.95rem' }}>Scan QR to Pay: ₹{total}</strong>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Scan using any UPI App (GPay, PhonePe, Paytm)</span>
+                  </div>
+
+                  <img 
+                    src="/payment.png" 
+                    alt="UPI Payment QR Code" 
+                    style={{ width: '160px', height: '160px', borderRadius: '8px', border: '1px solid var(--border)', background: '#fff', padding: '5px' }}
+                  />
+
+                  <div style={{ fontSize: '0.85rem' }}>
+                    <span>UPI ID: <strong>7619240665@ybl</strong></span>
+                  </div>
+
+                  <a 
+                    href={`upi://pay?pa=7619240665@ybl&pn=FluffyyyBloomss&am=${total}&cu=INR&tn=FluffyyyBloomss%20Order`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      background: '#10b981',
+                      color: '#fff',
+                      fontWeight: 'bold',
+                      padding: '0.6rem 1.2rem',
+                      borderRadius: '30px',
+                      fontSize: '0.85rem',
+                      boxShadow: '0 4px 10px rgba(16, 185, 129, 0.25)',
+                      width: '100%',
+                      maxWidth: '240px',
+                      transition: 'var(--transition)',
+                      marginTop: '0.25rem'
+                    }}
+                  >
+                    <span>📱 Pay with UPI App</span>
+                  </a>
+                  
+                  <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
+                    If on phone, click the button to open your payment apps automatically!
+                  </p>
+                </div>
+              )}
+
               {!currentUser && (
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '0.25rem' }}>
                   Checking out as Guest. You can also{' '}
@@ -413,7 +536,7 @@ export const CartView: React.FC<CartViewProps> = ({
               )}
 
               <button type="submit" className="btn-primary mt-2" style={{ padding: '1rem' }}>
-                Place Order (Cash on Delivery)
+                {paymentMethod === 'UPI' ? 'Confirm & Place Order (Paid via UPI)' : 'Place Order (Cash on Delivery)'}
               </button>
             </form>
           </div>

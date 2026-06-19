@@ -6,7 +6,7 @@ import type { User as DbUser } from '../data/db';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: DbUser) => void;
+  onSuccess: (user: DbUser, isRegister?: boolean) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
@@ -26,7 +26,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
     if (isLogin) {
       loginUser(email, password).then(user => {
         if (user) {
-          onSuccess(user);
+          onSuccess(user, false);
           onClose();
           resetForm();
         } else {
@@ -49,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
       registerUser(name, email, password).then(user => {
         if (user) {
-          onSuccess(user);
+          onSuccess(user, true);
           onClose();
           resetForm();
         } else {

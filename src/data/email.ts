@@ -15,7 +15,7 @@ export const sendOrderEmail = async (order: Order): Promise<boolean> => {
       "Customer Phone": order.phone,
       "Shipping Address": order.address,
       "Items Ordered": order.items.map(item => `${item.title} x${item.quantity} (₹${item.price})`).join('\n'),
-      "Total Billing": `₹${order.total} (Cash on Delivery)`,
+      "Total Billing": `₹${order.total} (${order.paymentMethod || 'Cash on Delivery'}${order.paymentStatus ? ` - ${order.paymentStatus}` : ''})`,
       "_replyto": order.email
     };
 

@@ -11,6 +11,7 @@ import { Preloader } from './components/Preloader';
 import { getLoggedInUser, getProducts, logoutUser, syncProducts } from './data/db';
 import type { Product, User } from './data/db';
 import { Heart, Lock } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface CartItem {
   product: Product;
@@ -27,6 +28,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [pendingAddToCart, setPendingAddToCart] = useState<Product | null>(null);
+  const [welcomeToast, setWelcomeToast] = useState<{ name: string; action: 'login' | 'register' | 'order' } | null>(null);
 
   // Initialize data on mount
   useEffect(() => {
@@ -57,6 +60,46 @@ function App() {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Auto-dismiss welcome toast
+  useEffect(() => {
+    if (welcomeToast) {
+      const timer = setTimeout(() => {
+        setWelcomeToast(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [welcomeToast]);
+
+  const triggerCrackerBurst = () => {
+    const duration = 2.5 * 1000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.8 }
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.8 }
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  };
+
+  const showWelcomeToast = (name: string, action: 'login' | 'register' | 'order') => {
+    setWelcomeToast({ name, action });
+    triggerCrackerBurst();
+  };
+
   // Refresh products list
   const refreshProducts = (forceSync = false) => {
     setProducts(getProducts());
@@ -67,9 +110,7 @@ function App() {
     }
   };
 
-  const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation(); // Stop opening product modal when clicking add-to-cart on card
-    
+  const addToCartInternal = (product: Product) => {
     setCartItems(prevItems => {
       const existing = prevItems.find(item => item.product.id === product.id);
       if (existing) {
@@ -81,6 +122,18 @@ function App() {
       }
       return [...prevItems, { product, quantity: 1 }];
     });
+  };
+
+  const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation(); // Stop opening product modal when clicking add-to-cart on card
+    
+    if (!currentUser) {
+      setPendingAddToCart(product);
+      setIsAuthOpen(true);
+      return;
+    }
+    
+    addToCartInternal(product);
   };
 
   const handleUpdateQty = (productId: string, quantity: number) => {
@@ -101,10 +154,17 @@ function App() {
     setCartItems([]);
   };
 
-  const handleLoginSuccess = (user: User) => {
+  const handleLoginSuccess = (user: User, isRegister?: boolean) => {
     setCurrentUser(user);
+    showWelcomeToast(user.name, isRegister ? 'register' : 'login');
     if (user.isAdmin) {
       setView('admin');
+    } else {
+      // Auto-add the pending product if any
+      if (pendingAddToCart) {
+        addToCartInternal(pendingAddToCart);
+        setPendingAddToCart(null);
+      }
     }
   };
 
@@ -172,6 +232,7 @@ function App() {
             currentUser={currentUser}
             setView={setView}
             onOpenAuth={() => setIsAuthOpen(true)}
+            onOrderConfirmed={(name) => showWelcomeToast(name, 'order')}
           />
         )}
 
@@ -212,7 +273,7 @@ function App() {
         </div>
         <p style={{ marginBottom: '0.75rem', lineHeight: '1.5', fontSize: '0.8rem' }}>
           Beautiful Handcrafted Flowers, Keychains, and anime canvas art.&nbsp;
-          Made with love &amp; high-quality milk cotton yarn.
+          Made with love.
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '0.75rem', fontWeight: 600, fontSize: '0.8rem' }}>
           <button onClick={() => setView('shop')} style={{ color: 'var(--text-muted)' }}>Shop</button>
@@ -246,9 +307,49 @@ function App() {
 
       <AuthModal
         isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
+        onClose={() => {
+          setIsAuthOpen(false);
+          setPendingAddToCart(null);
+        }}
         onSuccess={handleLoginSuccess}
       />
+
+      {welcomeToast && (
+        <div 
+          className="glass"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '1.25rem 2.5rem',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.25rem',
+            border: '2px solid var(--primary)',
+            background: 'rgba(254, 252, 250, 0.95)',
+            textAlign: 'center',
+            minWidth: '320px',
+            animation: 'slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          }}
+        >
+          <span style={{ fontSize: '1.8rem', marginBottom: '0.25rem' }}>
+            {welcomeToast.action === 'order' ? '🌸' : '✨'}
+          </span>
+          <strong style={{ fontSize: '1.2rem', color: 'var(--text-main)', fontWeight: 800 }}>
+            {welcomeToast.action === 'order' ? 'Order Confirmed!' : `Welcome, ${welcomeToast.name}!`}
+          </strong>
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+            {welcomeToast.action === 'login' && 'Nice to see you again!'}
+            {welcomeToast.action === 'register' && 'Thank you for joining our boutique!'}
+            {welcomeToast.action === 'order' && 'Your payment & order are registered successfully!'}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

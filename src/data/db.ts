@@ -35,6 +35,8 @@ export interface Order {
   total: number;
   status: 'Pending' | 'Shipped' | 'Delivered';
   date: string;
+  paymentMethod?: 'UPI' | 'COD';
+  paymentStatus?: 'Pending' | 'Paid' | 'Failed';
 }
 
 // Initial products mapping using the uploaded WhatsApp images
@@ -107,8 +109,15 @@ export const getProducts = (): Product[] => {
   return prods ? JSON.parse(prods) : [];
 };
 
+const DEFAULT_GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzTay58wSeIN9w26bruA87EiUIG9fV-2Yd8s38dHKAlKlmWVamftxHmZqhxwhFFz8f0A/exec';
+const DEFAULT_USER_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwgQ6c_10-qO0h5qC1fK9CA6z5niwR_3w7CuusAawwgA8yN35uaoBoPSAvJDa-wb0sB/exec';
+
 export const getGoogleSheetUrl = (): string => {
-  return localStorage.getItem(STORAGE_KEYS.GOOGLE_SHEET_URL) || '';
+  const saved = localStorage.getItem(STORAGE_KEYS.GOOGLE_SHEET_URL);
+  if (saved === null) {
+    return DEFAULT_GOOGLE_SHEET_URL;
+  }
+  return saved;
 };
 
 export const setGoogleSheetUrl = (url: string): void => {
@@ -116,7 +125,11 @@ export const setGoogleSheetUrl = (url: string): void => {
 };
 
 export const getUserSheetUrl = (): string => {
-  return localStorage.getItem(STORAGE_KEYS.USER_SHEET_URL) || '';
+  const saved = localStorage.getItem(STORAGE_KEYS.USER_SHEET_URL);
+  if (saved === null) {
+    return DEFAULT_USER_SHEET_URL;
+  }
+  return saved;
 };
 
 export const setUserSheetUrl = (url: string): void => {

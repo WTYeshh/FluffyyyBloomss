@@ -349,6 +349,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                       </td>
                       <td>
                         <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>₹{order.total}</strong>
+                        <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontWeight: 'bold', color: 'var(--text-muted)' }}>
+                            {order.paymentMethod === 'UPI' ? '💳 UPI Pay' : '💵 Cash COD'}
+                          </span>
+                          <span style={{ 
+                            color: order.paymentStatus === 'Paid' ? '#10b981' : '#f59e0b',
+                            fontWeight: '600'
+                          }}>
+                            {order.paymentStatus === 'Paid' ? 'Paid' : 'COD Unpaid'}
+                          </span>
+                        </div>
                       </td>
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
