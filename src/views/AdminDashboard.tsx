@@ -1,44 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X } from 'lucide-react';
 import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
 
-// List of preloaded local WhatsApp images
+// List of preloaded local images
 const LOCAL_IMAGES = [
-  'WhatsApp Image 2026-06-17 at 6.28.42 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.28.43 PM.jpeg',
-  'WhatsApp Image 2026-06-17 6.28.44 PM.jpeg',
-  'WhatsApp Image 2026-06gf17 at 6.28.44 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.28.45 PM.jpeg',
-  'WhatsApp Image 2026-07 at 6.28.45 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.28.46 PM.jpeg',
-  'WhatsApp Image 2026-weat 6.28.46 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.28.47 PM.jpeg',
-  'WhatsApp Image 2026-06-gt 6.28.47 PM.jpeg',
-  'WhatsApp][ge 2026-06-17 at 6.28.47 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.28.47thuuu (1).jpeg',
-  'WhatsApp Image 2026-06-17 qwawset 6.28.48 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.28.49 PM.jpeg',
-  'WhatsApp-7 at 6.28.49 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at =-28.49 PM.jpeg',
-  'WhatsApp Image 2026-06-17 agfds48 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at  PM.jpeg',
-  'WhatsApp Image 2026-06-17 at 6.285 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at hg44 PM.jpeg',
-  'WhatsApp Image 2026-06-17 at ytrPM.jpeg',
-  'WhatsApp Image 2sdvb at 6.28.46 PM.jpeg',
-  'WhatsApp Ima[pojhg 2026-06-17 at 6.28.46 PM.jpeg'
+  'flower-1.jpeg',
+  'flower-2.jpeg',
+  'flower-3.jpeg',
+  'flower-4.jpeg',
+  'flower-5.jpeg',
+  'flower-6.jpeg',
+  'flower-7.jpeg',
+  'flower-8.jpeg',
+  'keychain-1.jpeg',
+  'keychain-2.jpeg',
+  'keychain-3.jpeg',
+  'keychain-4.jpeg',
+  'keychain-5.jpeg',
+  'keychain-6.jpeg',
+  'keychain-7.jpeg',
+  'keychain-8.jpeg',
+  'art-1.jpeg',
+  'art-2.jpeg',
+  'art-3.jpeg',
+  'art-4.jpeg',
+  'art-5.jpeg',
+  'art-6.jpeg',
+  'art-7.jpeg'
 ];
 
 interface AdminDashboardProps {
+  products: Product[];
   onProductsUpdated: () => void;
 }
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdated }) => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initialProducts, onProductsUpdated }) => {
   const [activeSubTab, setActiveSubTab] = useState<'orders' | 'products' | 'stats'>('orders');
-  const [products, setProducts] = useState<Product[]>(getProducts());
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [orders, setOrders] = useState<Order[]>(getOrders());
+
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
 
   // Form State
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -232,6 +237,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
     });
     return map;
   }, {});
+
+  // Get dynamic current image path for preview
+  const getCurrentImagePreview = () => {
+    if (imageType === 'upload') {
+      return imageUploadBase64 || (editingId ? products.find(p => p.id === editingId)?.image || '' : '');
+    } else if (imageType === 'select') {
+      return `/images/${imageSelect}`;
+    } else {
+      return imageUrl;
+    }
+  };
 
   return (
     <div className="admin-layout">
@@ -523,13 +539,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       Drag & Drop or Click to select image
                     </p>
-                    {imageUploadBase64 && (
-                      <img 
-                        src={imageUploadBase64} 
-                        alt="Upload preview" 
-                        className="preview-upload-img" 
-                      />
-                    )}
                   </div>
                 )}
 
@@ -544,11 +553,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
                         <option key={idx} value={img}>{img}</option>
                       ))}
                     </select>
-                    <img 
-                      src={`/images/${imageSelect}`} 
-                      alt="Local selection preview" 
-                      style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '0.5rem' }}
-                    />
                   </div>
                 )}
 
@@ -561,14 +565,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductsUpdate
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
                     />
-                    {imageUrl.trim() && (
+                  </div>
+                )}
+
+                {/* Unified Image Preview */}
+                {getCurrentImagePreview() && (
+                  <div className="flex-column" style={{ gap: '0.4rem', marginTop: '0.75rem' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Selected Image Preview:
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <img 
-                        src={imageUrl} 
-                        alt="URL preview" 
-                        style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '0.5rem' }}
-                        onError={(e) => { (e.target as any).src = 'https://placehold.co/100?text=Invalid+URL'; }}
+                        src={getCurrentImagePreview()} 
+                        alt="Selected Preview" 
+                        style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '12px', border: '2px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
+                        onError={(e) => { 
+                          if (imageType === 'url') {
+                            (e.target as any).src = 'https://placehold.co/150?text=Invalid+URL'; 
+                          } else {
+                            (e.target as any).src = 'https://placehold.co/150?text=No+Image'; 
+                          }
+                        }}
                       />
-                    )}
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', wordBreak: 'break-all', maxWidth: '240px' }}>
+                        {imageType === 'upload' ? 'Uploaded Base64 Data' : getCurrentImagePreview()}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>

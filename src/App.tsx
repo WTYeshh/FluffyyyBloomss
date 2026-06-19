@@ -58,11 +58,13 @@ function App() {
   }, [cartItems]);
 
   // Refresh products list
-  const refreshProducts = () => {
+  const refreshProducts = (forceSync = false) => {
     setProducts(getProducts());
-    syncProducts().then(syncedProducts => {
-      setProducts(syncedProducts);
-    });
+    if (forceSync) {
+      syncProducts().then(syncedProducts => {
+        setProducts(syncedProducts);
+      });
+    }
   };
 
   const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
@@ -174,7 +176,7 @@ function App() {
         {currentView === 'admin' && (
           currentUser?.isAdmin ? (
             <React.Suspense fallback={<div className="text-center" style={{ padding: '4rem 2rem' }}>Loading Admin Panel...</div>}>
-              <AdminDashboard onProductsUpdated={refreshProducts} />
+              <AdminDashboard products={products} onProductsUpdated={refreshProducts} />
             </React.Suspense>
           ) : (
             <div className="text-center" style={{ padding: '8rem 2rem', maxWidth: '400px', margin: '0 auto' }}>
