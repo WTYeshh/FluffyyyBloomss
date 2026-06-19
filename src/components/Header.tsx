@@ -71,11 +71,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Laptop/Desktop Actions + Mobile Burger Toggle */}
         <div className="nav-actions">
           {/* Sign In (Desktop) */}
-          <div className="nav-links" style={{ gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
             {currentUser ? (
               <div className="user-profile-btn">
                 <UserIcon size={15} />
-                <span>{currentUser.name.split(' ')[0]}</span>
+                <span className="hide-on-mobile">{currentUser.name.split(' ')[0]}</span>
                 <button
                   onClick={onLogout}
                   title="Log Out"
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button className="user-profile-btn" onClick={onOpenAuth}>
                 <UserIcon size={15} />
-                <span>Sign In</span>
+                <span className="hide-on-mobile">Sign In</span>
               </button>
             )}
           </div>

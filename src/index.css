@@ -1076,6 +1076,14 @@ button {
     display: none; /* Hide standard nav links on mobile */
   }
   
+  .user-profile-btn {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .hide-on-mobile {
+    display: none;
+  }
+  
   .mobile-menu-toggle {
     display: flex; /* Show menu toggle button on mobile */
     color: var(--text-main);
