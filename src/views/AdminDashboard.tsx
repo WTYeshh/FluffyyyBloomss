@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold, getOrdersSheetUrl, setOrdersSheetUrl, syncOrders } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
@@ -73,6 +73,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const [shippingFeeInput, setShippingFeeInput] = useState(getShippingFee().toString());
   const [shippingThresholdInput, setShippingThresholdInput] = useState(getShippingThreshold().toString());
   const [isShippingLocked, setIsShippingLocked] = useState(true);
+  const [publishToast, setPublishToast] = useState<{ visible: boolean; success: boolean; sheetSynced: boolean; message: string } | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [showPublishSuccessModal, setShowPublishSuccessModal] = useState(false);
+  const [publishedProductName, setPublishedProductName] = useState('');
 
   // Handle local image upload to Base64
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +90,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     }
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const showToast = (success: boolean, sheetSynced: boolean, isEdit: boolean) => {
+    const message = success
+      ? isEdit
+        ? sheetSynced
+          ? '✅ Product updated & synced to Google Sheet!'
+          : '✅ Product updated locally. (Sheet sync failed — check your Sheet URL)'
+        : sheetSynced
+          ? '✅ Product published & saved to Google Sheet!'
+          : '✅ Product published locally. (Sheet sync failed — check your Sheet URL)'
+      : '❌ Failed to publish product.';
+    setPublishToast({ visible: true, success, sheetSynced, message });
+    setTimeout(() => setPublishToast(null), 5000);
+  };
+
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
 
@@ -126,6 +144,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       productImg = imageUrl;
     }
 
+    const isEdit = !!editingId;
     const targetProduct: Product = {
       id: editingId || 'product-' + Date.now(),
       title,
@@ -137,15 +156,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
       isAvailable: true
     };
 
-    saveProduct(targetProduct).then(() => {
-      // Refresh lists
+    setIsPublishing(true);
+    try {
+      const result = await saveProduct(targetProduct);
       setProducts(getProducts());
       onProductsUpdated();
       
-      // Reset Form
+      const pTitle = targetProduct.title;
       resetForm();
-    });
+
+      if (result.sheetSynced) {
+        setPublishedProductName(pTitle);
+        setShowPublishSuccessModal(true);
+      } else {
+        showToast(true, false, isEdit);
+      }
+    } catch (err) {
+      showToast(false, false, isEdit);
+    } finally {
+      setIsPublishing(false);
+    }
   };
+
 
   const handleStartEdit = (product: Product) => {
     setEditingId(product.id);
@@ -691,8 +723,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                <button type="submit" className="btn-primary" style={{ flexGrow: 1 }}>
-                  {editingId ? 'Save Changes' : 'Publish Product'}
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{ flexGrow: 1, opacity: isPublishing ? 0.75 : 1, cursor: isPublishing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                  disabled={isPublishing}
+                >
+                  {isPublishing ? (
+                    <>
+                      <span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                      {editingId ? 'Saving & syncing...' : 'Publishing & syncing...'}
+                    </>
+                  ) : (
+                    editingId ? 'Save Changes' : 'Publish Product'
+                  )}
                 </button>
                 {editingId && (
                   <button type="button" className="tab-btn" onClick={resetForm} style={{ margin: 0 }}>
@@ -701,6 +745,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                 )}
               </div>
             </form>
+
+            {/* Publish confirmation toast */}
+            {publishToast && (
+              <div
+                style={{
+                  marginTop: '1rem',
+                  padding: '0.9rem 1.1rem',
+                  borderRadius: '10px',
+                  border: `1.5px solid ${publishToast.sheetSynced ? '#10b981' : publishToast.success ? '#f59e0b' : '#ef4444'}`,
+                  background: publishToast.sheetSynced ? 'rgba(16,185,129,0.08)' : publishToast.success ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.65rem',
+                  animation: 'fadeInUp 0.3s ease'
+                }}
+              >
+                <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>
+                  {publishToast.sheetSynced ? '✅' : publishToast.success ? '⚠️' : '❌'}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <strong style={{ display: 'block', fontSize: '0.92rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                    {publishToast.sheetSynced
+                      ? 'Confirmed — saved to Google Sheet!'
+                      : publishToast.success
+                      ? 'Saved locally only'
+                      : 'Publish failed'}
+                  </strong>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    {publishToast.message}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* List of Products */}
@@ -1621,6 +1698,69 @@ function doGet(e) {
                 Got It, Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Verified Publish Success Modal */}
+      {showPublishSuccessModal && (
+        <div className="modal-overlay" style={{ zIndex: 100000 }} onClick={() => setShowPublishSuccessModal(false)}>
+          <div 
+            className="modal-content glass" 
+            style={{ 
+              maxWidth: '420px', 
+              textAlign: 'center', 
+              padding: '2.5rem 2rem', 
+              borderRadius: '24px', 
+              border: '2px solid #10b981',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+              animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+            }} 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+              <div 
+                style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  borderRadius: '50%', 
+                  background: 'rgba(16, 185, 129, 0.1)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  color: '#10b981'
+                }}
+              >
+                <CheckCircle2 size={36} />
+              </div>
+            </div>
+            
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+              Verified Excel Sync!
+            </h3>
+            
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+              Product <strong style={{ color: 'var(--text-main)' }}>"{publishedProductName}"</strong> has been successfully published and we have verified that it is saved in your Excel Google Sheet!
+            </p>
+            
+            <button 
+              className="btn-primary" 
+              style={{ 
+                background: '#10b981', 
+                color: '#fff', 
+                width: '100%', 
+                borderRadius: '12px',
+                padding: '0.8rem',
+                fontSize: '0.95rem',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onClick={() => setShowPublishSuccessModal(false)}
+            >
+              Excellent!
+            </button>
           </div>
         </div>
       )}

@@ -58,9 +58,15 @@ const STORAGE_KEYS = {
 
 // Initialize DB if empty
 export const initDB = () => {
+  if (!localStorage.getItem('fluffy_bloom_clean_sheet_v2')) {
+    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify([]));
+    localStorage.setItem('fluffy_bloom_clean_sheet_v2', 'true');
+  }
+
   if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
     localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
   }
+
   
   const defaultAdmin = {
     id: 'admin-1',
@@ -243,7 +249,7 @@ export const syncProducts = async (): Promise<Product[]> => {
   return getProducts();
 };
 
-export const saveProduct = async (product: Product): Promise<void> => {
+export const saveProduct = async (product: Product): Promise<{ sheetSynced: boolean }> => {
   const products = getProducts();
   const index = products.findIndex(p => p.id === product.id);
   
@@ -258,21 +264,39 @@ export const saveProduct = async (product: Product): Promise<void> => {
   const url = getGoogleSheetUrl();
   if (url) {
     try {
-      await fetch(url, {
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify({
-          action: 'save',
-          product: product
-        })
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'save', product: product })
       });
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.success) {
+          // Verify by fetching from sheet (up to 2 attempts with a short delay if not found immediately)
+          let found = false;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            const syncedProducts = await syncProducts();
+            found = syncedProducts.some(p => p.id === product.id);
+            if (found) break;
+            if (attempt === 0) {
+              await new Promise(resolve => setTimeout(resolve, 1500)); // wait 1.5 seconds before retrying
+            }
+          }
+          if (found) {
+            return { sheetSynced: true };
+          }
+        }
+      }
     } catch (e) {
-      console.error("Failed to post product to Google Sheets:", e);
+      console.error("Failed to post product to Google Sheets and verify:", e);
     }
+    return { sheetSynced: false };
   }
+
+  // No sheet connected — saved locally only
+  return { sheetSynced: false };
 };
+
 
 export const deleteProduct = async (id: string): Promise<void> => {
   const products = getProducts();
