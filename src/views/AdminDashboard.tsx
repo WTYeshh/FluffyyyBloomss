@@ -82,15 +82,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     }
     
     const parsedPrice = parseFloat(price);
-    const parsedOrigPrice = parseFloat(originalPrice);
+    const parsedOrigPrice = isNaN(parseFloat(originalPrice)) ? parsedPrice : parseFloat(originalPrice);
 
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
       setFormError('Please enter a valid selling price greater than 0.');
-      return;
-    }
-
-    if (isNaN(parsedOrigPrice) || parsedOrigPrice < parsedPrice) {
-      setFormError('Original (strike) price must be equal to or greater than the sale price.');
       return;
     }
 
@@ -458,7 +453,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label">Pricing Tactics</label>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '-0.3rem', marginBottom: '0.3rem' }}>
-                    Strike price &gt; Sale price
+                    Strike price (optional)
                   </span>
                 </div>
               </div>
@@ -473,7 +468,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                     placeholder="e.g. 999"
                     value={originalPrice}
                     onChange={(e) => setOriginalPrice(e.target.value)}
-                    required
                   />
                 </div>
                 <div className="form-group" style={{ margin: 0 }}>
