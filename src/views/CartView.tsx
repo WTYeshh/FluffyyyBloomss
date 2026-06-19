@@ -40,6 +40,13 @@ export const CartView: React.FC<CartViewProps> = ({
   const [formError, setFormError] = useState('');
   const [successOrder, setSuccessOrder] = useState<any | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('COD');
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText('7619240665@ybl');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Sync email & name when currentUser changes
   React.useEffect(() => {
@@ -492,9 +499,31 @@ export const CartView: React.FC<CartViewProps> = ({
                     style={{ width: '160px', height: '160px', borderRadius: '8px', border: '1px solid var(--border)', background: '#fff', padding: '5px' }}
                   />
 
-                  <div style={{ fontSize: '0.85rem' }}>
-                    <span>UPI ID: <strong>7619240665@ybl</strong></span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>UPI ID:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--border)', padding: '0.4rem 0.8rem', borderRadius: '20px' }}>
+                      <strong style={{ fontSize: '0.9rem' }}>7619240665@ybl</strong>
+                      <button 
+                        type="button" 
+                        onClick={handleCopyUpi}
+                        style={{
+                          background: 'var(--primary)',
+                          color: '#fff',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {copied ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
                   </div>
+
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.4', margin: '0.25rem 0' }}>
+                    <strong>If GPay/PhonePe displays an error:</strong> This is a security feature by some banks for personal accounts. Simply **screenshot the QR code** or **copy the UPI ID** above, open your app, and scan/paste to pay!
+                  </p>
 
                   <a 
                     href={`upi://pay?pa=7619240665@ybl&pn=FluffyyyBloomss&am=${total}&cu=INR&tn=FluffyyyBloomss%20Order`}
@@ -503,25 +532,21 @@ export const CartView: React.FC<CartViewProps> = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
-                      background: '#10b981',
-                      color: '#fff',
+                      background: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
                       fontWeight: 'bold',
-                      padding: '0.6rem 1.2rem',
+                      padding: '0.5rem 1.2rem',
                       borderRadius: '30px',
-                      fontSize: '0.85rem',
-                      boxShadow: '0 4px 10px rgba(16, 185, 129, 0.25)',
+                      fontSize: '0.8rem',
                       width: '100%',
                       maxWidth: '240px',
                       transition: 'var(--transition)',
                       marginTop: '0.25rem'
                     }}
                   >
-                    <span>📱 Pay with UPI App</span>
+                    <span>📱 Launch UPI App Link</span>
                   </a>
-                  
-                  <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
-                    If on phone, click the button to open your payment apps automatically!
-                  </p>
                 </div>
               )}
 
