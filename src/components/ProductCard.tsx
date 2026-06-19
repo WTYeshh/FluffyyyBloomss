@@ -30,13 +30,43 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
         </span>
       )}
       
-      <div className="product-img-container">
+      <div className="product-img-container" style={{ position: 'relative' }}>
         <img
           src={product.image}
           alt={product.title}
           className="product-img"
           loading="lazy"
+          style={{ filter: product.isAvailable ? 'none' : 'grayscale(80%) brightness(70%)' }}
         />
+        {!product.isAvailable && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(2px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1
+          }}>
+            <span style={{
+              background: '#ef4444',
+              color: '#ffffff',
+              padding: '0.4rem 0.8rem',
+              fontSize: '0.75rem',
+              fontWeight: 800,
+              borderRadius: '30px',
+              letterSpacing: '1.2px',
+              textTransform: 'uppercase',
+              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)'
+            }}>
+              Sold Out
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="product-details">

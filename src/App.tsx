@@ -118,6 +118,7 @@ function App() {
 
   const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
     if (e) e.stopPropagation(); // Stop opening product modal when clicking add-to-cart on card
+    if (!product.isAvailable) return;
     
     if (!currentUser) {
       setPendingAddToCart(product);

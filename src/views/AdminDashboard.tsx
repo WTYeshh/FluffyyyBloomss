@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Upload, FileText, ShoppingBag, DollarSign, Package, TrendingUp, Download, Link, X, Users, Star, Lock, RefreshCw, CheckCircle2, Ban } from 'lucide-react';
 import { getOrders, getProducts, saveProduct, deleteProduct, updateOrderStatus, getGoogleSheetUrl, setGoogleSheetUrl, syncProducts, getUserSheetUrl, setUserSheetUrl, getUsers, getShippingFee, setShippingFee, getShippingThreshold, setShippingThreshold, getOrdersSheetUrl, setOrdersSheetUrl, syncOrders } from '../data/db';
 import type { Product, Order } from '../data/db';
 import { sendDelayEmail } from '../data/email';
@@ -294,6 +294,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
     const updated = {
       ...product,
       isFeatured: !product.isFeatured
+    };
+    saveProduct(updated).then(() => {
+      setProducts(getProducts());
+      onProductsUpdated();
+    });
+  };
+
+  const handleToggleAvailability = (product: Product) => {
+    const updated = {
+      ...product,
+      isAvailable: !product.isAvailable
     };
     saveProduct(updated).then(() => {
       setProducts(getProducts());
@@ -877,6 +888,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
                             title={prod.isFeatured ? "Starred (Featured Bestseller)" : "Star (Feature on Home Page)"}
                           >
                             <Star size={14} fill={prod.isFeatured ? "#f59e0b" : "none"} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleAvailability(prod)}
+                            style={{ 
+                              color: !prod.isAvailable ? '#ef4444' : 'var(--text-muted)', 
+                              padding: '0.4rem', 
+                              border: '1px solid var(--border)', 
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              background: !prod.isAvailable ? 'rgba(239, 68, 68, 0.08)' : 'transparent',
+                              cursor: 'pointer'
+                            }}
+                            title={!prod.isAvailable ? "Marked as Sold Out (Click to Make Available)" : "Available (Click to Mark Sold Out)"}
+                          >
+                            <Ban size={14} />
                           </button>
                           <button
                             type="button"
