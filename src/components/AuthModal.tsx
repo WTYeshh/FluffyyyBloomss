@@ -24,14 +24,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
     setError('');
 
     if (isLogin) {
-      const user = loginUser(email, password);
-      if (user) {
-        onSuccess(user);
-        onClose();
-        resetForm();
-      } else {
-        setError('Invalid email or password. Hint: yeshwanthkg@gmail.com / Vinod Jangir');
-      }
+      loginUser(email, password).then(user => {
+        if (user) {
+          onSuccess(user);
+          onClose();
+          resetForm();
+        } else {
+          setError('Invalid email or password.');
+        }
+      });
     } else {
       if (!name.trim()) {
         setError('Please enter your name');
@@ -46,14 +47,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         return;
       }
 
-      const user = registerUser(name, email, password);
-      if (user) {
-        onSuccess(user);
-        onClose();
-        resetForm();
-      } else {
-        setError('An account with this email already exists.');
-      }
+      registerUser(name, email, password).then(user => {
+        if (user) {
+          onSuccess(user);
+          onClose();
+          resetForm();
+        } else {
+          setError('An account with this email already exists.');
+        }
+      });
     }
   };
 
@@ -182,14 +184,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
             </button>
           </form>
 
-          {isLogin && (
-            <div className="text-center mt-4" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              <p>Demo Admin Account:</p>
-              <code style={{ background: 'var(--border)', padding: '2px 6px', borderRadius: '4px', display: 'inline-block', marginTop: '0.25rem' }}>
-                yeshwanthkg@gmail.com / Vinod Jangir
-              </code>
-            </div>
-          )}
+
         </div>
       </div>
     </div>

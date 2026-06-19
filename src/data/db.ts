@@ -59,8 +59,8 @@ export const initDB = () => {
   const defaultAdmin = {
     id: 'admin-1',
     name: 'Admin',
-    email: 'yeshwanthkg@gmail.com',
-    password: 'Vinod Jangir',
+    email: 'preethijangir8@gmail.com',
+    password: '', // Password verified by hash dynamically
     isAdmin: true
   };
 
@@ -71,13 +71,13 @@ export const initDB = () => {
         id: 'user-1',
         name: 'Jane Doe',
         email: 'jane@example.com',
-        password: 'user123',
+        password: 'e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446', // SHA-256 for user123
         isAdmin: false
       }
     ];
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultUsers));
   } else {
-    // Keep admin credentials synchronized to yeshwanthkg@gmail.com / Vinod Jangir
+    // Keep admin credentials synchronized
     try {
       const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)!);
       const adminIdx = users.findIndex((u: any) => u.isAdmin === true);
@@ -196,6 +196,14 @@ export const deleteProduct = async (id: string): Promise<void> => {
   }
 };
 
+// Helper to hash a string with SHA-256
+const sha256 = async (message: string): Promise<string> => {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
 // User Functions
 export const getUsers = () => {
   initDB();
@@ -208,9 +216,20 @@ export const getLoggedInUser = (): User | null => {
   return user ? JSON.parse(user) : null;
 };
 
-export const loginUser = (email: string, password: string): User | null => {
+export const loginUser = async (email: string, password: string): Promise<User | null> => {
+  const emailHash = await sha256(email.toLowerCase().trim());
+  const passHash = await sha256(password);
+
+  // Secure admin comparison using SHA-256 hashes
+  if (emailHash === 'e55e09a34262a714f548430a90ac28d0a873992f3a6120c0ba636a2ddb8d622d' && 
+      passHash === '7019dd2b07418604e5ec705ac3ec4a60dbb763da07f8f038909c183f42d06225') {
+    const loggedIn = { id: 'admin-1', name: 'Admin', email: 'preethijangir8@gmail.com', isAdmin: true };
+    localStorage.setItem(STORAGE_KEYS.LOGGED_IN_USER, JSON.stringify(loggedIn));
+    return loggedIn;
+  }
+
   const users = getUsers();
-  const found = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+  const found = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase() && u.password === passHash);
   if (found) {
     const loggedIn = { id: found.id, name: found.name, email: found.email, isAdmin: found.isAdmin };
     localStorage.setItem(STORAGE_KEYS.LOGGED_IN_USER, JSON.stringify(loggedIn));
@@ -219,16 +238,17 @@ export const loginUser = (email: string, password: string): User | null => {
   return null;
 };
 
-export const registerUser = (name: string, email: string, password: string): User | null => {
+export const registerUser = async (name: string, email: string, password: string): Promise<User | null> => {
   const users = getUsers();
   const exists = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
   if (exists) return null;
   
+  const passHash = await sha256(password);
   const newUser = {
     id: 'user-' + Date.now(),
     name,
     email,
-    password,
+    password: passHash,
     isAdmin: false
   };
   
