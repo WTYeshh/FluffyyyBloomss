@@ -105,7 +105,7 @@ export const CartView: React.FC<CartViewProps> = ({
       total: total
     });
 
-    // Send order confirmation details to preethijangir8@gmail.com
+    // Send order confirmation details to FluffyyyBloomss@gmail.com
     sendOrderEmail(order);
 
     setSuccessOrder(order);

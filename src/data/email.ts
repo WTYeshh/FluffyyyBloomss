@@ -1,6 +1,6 @@
 import type { Order } from './db';
 
-const TEST_EMAIL = 'preethijangir8@gmail.com';
+const TEST_EMAIL = 'FluffyyyBloomss@gmail.com';
 
 /**
  * Sends order placement email notification to the test email address.

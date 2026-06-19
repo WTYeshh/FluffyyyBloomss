@@ -59,7 +59,7 @@ export const initDB = () => {
   const defaultAdmin = {
     id: 'admin-1',
     name: 'Admin',
-    email: 'preethijangir8@gmail.com',
+    email: 'FluffyyyBloomss@gmail.com',
     password: '', // Password verified by hash dynamically
     isAdmin: true
   };
@@ -238,9 +238,9 @@ export const loginUser = async (email: string, password: string): Promise<User |
   const passHash = await sha256(password);
 
   // Secure admin comparison using SHA-256 hashes
-  if (emailHash === 'e55e09a34262a714f548430a90ac28d0a873992f3a6120c0ba636a2ddb8d622d' && 
+  if (emailHash === '59f239fc6ed731b28a586870699687fcb39658553fc75c2e2bd0cc42486aec32' && 
       passHash === '7019dd2b07418604e5ec705ac3ec4a60dbb763da07f8f038909c183f42d06225') {
-    const loggedIn = { id: 'admin-1', name: 'Admin', email: 'preethijangir8@gmail.com', isAdmin: true };
+    const loggedIn = { id: 'admin-1', name: 'Admin', email: 'FluffyyyBloomss@gmail.com', isAdmin: true };
     localStorage.setItem(STORAGE_KEYS.LOGGED_IN_USER, JSON.stringify(loggedIn));
     return loggedIn;
   }

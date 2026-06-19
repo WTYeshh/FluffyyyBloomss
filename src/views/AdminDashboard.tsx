@@ -171,7 +171,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ products: initia
   const handleSendDelayEmail = async (order: Order) => {
     const success = await sendDelayEmail(order);
     if (success) {
-      alert(`Patience/delay email successfully sent to preethijangir8@gmail.com for order #${order.id}!`);
+      alert(`Patience/delay email successfully sent to FluffyyyBloomss@gmail.com for order #${order.id}!`);
     } else {
       alert('Failed to send email. Check console logs for details.');
     }
